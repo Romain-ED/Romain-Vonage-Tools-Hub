@@ -40,6 +40,11 @@ app.get('/management-suite', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'management-suite', 'index.html'));
 });
 
+// Changelog page
+app.get('/changelog', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'changelog.html'));
+});
+
 // Health check endpoint for VCR (required endpoint: /_/health)
 app.get('/_/health', (req, res) => {
     console.log('Health check requested at /_/health');
