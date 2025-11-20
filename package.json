@@ -1,0 +1,27 @@
+{
+  "name": "romain-vonage-tools-hub",
+  "version": "1.0.0",
+  "description": "Unified hub for Romain's Vonage tools - A collection of web-based utilities for managing Vonage services",
+  "main": "server.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "vonage",
+    "tools",
+    "hub",
+    "telecommunications",
+    "management"
+  ],
+  "author": "Romain EDIN",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

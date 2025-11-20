@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vonage Reports API Filter Tool</title>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Original Styles -->
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* Hub navigation styles */
+        .hub-nav {
+            background: #1f2937;
+            border-bottom: 1px solid #374151;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hub-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .hub-nav-icon {
+            color: #60a5fa;
+            font-size: 1.25rem;
+        }
+
+        .hub-nav-title {
+            color: #ffffff;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .hub-nav-link {
+            color: #d1d5db;
+            text-decoration: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hub-nav-link:hover {
+            color: #60a5fa;
+            background: #374151;
+        }
+
+        .hub-version {
+            background: rgba(96, 165, 250, 0.2);
+            color: #60a5fa;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hub Navigation -->
+    <div class="hub-nav">
+        <div class="hub-nav-left">
+            <i class="fas fa-filter hub-nav-icon"></i>
+            <h1 class="hub-nav-title">Vonage Reports API Filter Tool</h1>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="/" class="hub-nav-link">
+                <i class="fas fa-home"></i>Back to Hub
+            </a>
+            <span class="hub-version">v2.0.0</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1>Vonage Reports API Filter Tool</h1>
+            <p>Upload and filter your Vonage CSV reports with ease</p>
+            <div class="header-nav">
+                <button class="btn btn-outline" id="docsBtn" onclick="window.location.href='docs.html'">Documentation</button>
+                <button class="btn btn-outline" id="darkModeBtn" onclick="if(window.csvTool) csvTool.toggleDarkMode(); else toggleDarkModeStandalone();">🌙 Dark Mode</button>
+            </div>
+        </header>
+
+        <main class="main">
+            <section class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📄</div>
+                    <h3>Drop your CSV file here or click to browse</h3>
+                    <p>Supports large CSV files</p>
+                    <input type="file" id="csvFile" accept=".csv" hidden>
+                </div>
+            </section>
+
+            <section class="file-info-section" id="fileInfoSection" style="display: none;">
+                <h2>📄 File Information</h2>
+                <div class="file-info-grid" id="fileInfoGrid">
+                    <!-- File info will be populated here -->
+                </div>
+            </section>
+
+            <section class="analysis-section" id="analysisSection" style="display: none;">
+                <h2>File Analysis</h2>
+                <p class="analysis-description">Select headers to analyze and view the top 10 most common values for each column.</p>
+                
+                <div class="analysis-controls">
+                    <div class="header-selection">
+                        <h3>Select Headers to Analyze</h3>
+                        <div class="header-checkboxes" id="headerCheckboxes">
+                            <!-- Dynamic header checkboxes will be added here -->
+                        </div>
+                    </div>
+                    <div class="analysis-actions">
+                        <button class="btn btn-primary" id="analyzeBtn">Analyze Selected Headers</button>
+                        <button class="btn btn-secondary" id="clearAnalysisBtn">Clear Analysis</button>
+                    </div>
+                </div>
+
+                <div class="analysis-results" id="analysisResults" style="display: none;">
+                    <h3>Analysis Results</h3>
+                    <div class="analysis-grid" id="analysisGrid">
+                        <!-- Analysis results will be displayed here -->
+                    </div>
+                </div>
+            </section>
+
+            <section class="filter-section" id="filterSection" style="display: none;">
+                <h2>Filter Options</h2>
+                <div class="filters-container" id="filtersContainer">
+                    <!-- Dynamic filter controls will be added here -->
+                </div>
+                <div class="filter-options">
+                    <label class="checkbox-option">
+                        <input type="checkbox" id="removeInternalFieldsCheckbox">
+                        <span class="checkbox-label">Remove Internal Fields</span>
+                        <span class="checkbox-description">Hide technical columns (route_cost, hlr_lookup_cost, gateway, etc.)</span>
+                    </label>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn btn-primary" id="addFilterBtn">Add Filter (Ctrl+F)</button>
+                    <button class="btn btn-success" id="applyFiltersBtn">Apply Filters (Ctrl+Enter)</button>
+                </div>
+            </section>
+
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <h2>Results</h2>
+                    <div class="results-controls">
+                        <input type="text" id="searchWithinResults" placeholder="Search within results..." class="search-input">
+                        <div class="results-info">
+                            <span id="totalRows">0</span> rows found
+                            <button class="btn btn-secondary" id="showAllResultsBtn" onclick="csvTool.showAllResults()" style="display: none; margin-left: 10px; font-size: 0.8rem; padding: 4px 8px;" title="Show all matching results without 50-row limit">🔄 Show All</button>
+                        </div>
+                        <div class="download-options">
+                            <button class="btn btn-primary" onclick="csvTool.downloadData('csv')">📄 Download CSV</button>
+                            <button class="btn btn-primary" onclick="csvTool.downloadData('json')">📋 Download JSON</button>
+                            <button class="btn btn-primary" onclick="csvTool.downloadData('excel')">📊 Download Excel</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="results-file-info" id="resultsFileInfo" style="display: none;">
+                    <h3>📊 Output File Information</h3>
+                    <div class="results-file-info-grid" id="resultsFileInfoGrid">
+                        <!-- Results file info will be populated here -->
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="resultsTable">
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="pagination"></div>
+            </section>
+
+            <section class="log-section" id="logSection">
+                <div class="log-header">
+                    <h2>Processing Log</h2>
+                    <div class="log-controls">
+                        <button class="btn btn-secondary" id="clearLogBtn">Clear Log</button>
+                        <button class="btn btn-secondary" id="toggleLogBtn">Hide Log</button>
+                        <button class="btn btn-primary" id="exportLogBtn">Export Debug Log</button>
+                    </div>
+                </div>
+                <div class="log-container" id="logContainer">
+                    <div class="log-entry info">
+                        <span class="log-time">Ready</span>
+                        <span class="log-message">CSV Filter Tool initialized. Upload a file to begin.</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
