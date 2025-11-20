@@ -1,0 +1,13 @@
+project:
+  name: romain-vonage-tools-hub
+
+instance:
+  name: production
+  runtime: nodejs22
+  region: aws.apse1
+  entrypoint: [node, server.mjs]
+  capabilities:
+    - voice
+  environment:
+    - name: NODE_ENV
+      value: "production"

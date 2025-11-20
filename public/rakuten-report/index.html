@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vonage - Rakuten Security Report Builder</title>
+    
+    <!-- External Libraries -->
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* Custom CSS for animations and styling */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .fa-spin {
+            animation: spin 1s linear infinite;
+        }
+        
+        .drag-over {
+            border-color: #3b82f6 !important;
+            background-color: #eff6ff !important;
+            transform: scale(1.02);
+            transition: all 0.2s ease;
+        }
+        
+        .terminal-log {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            color: #10b981;
+            min-height: 120px;
+            max-height: 300px;
+            height: auto;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid #374151;
+        }
+        
+        .terminal-log::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .terminal-log::-webkit-scrollbar-track {
+            background: #374151;
+            border-radius: 3px;
+        }
+        
+        .terminal-log::-webkit-scrollbar-thumb {
+            background: #6b7280;
+            border-radius: 3px;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Progress bar animations */
+        @keyframes progressFill {
+            from { width: 0%; }
+        }
+        
+        .progress-fill {
+            animation: progressFill 0.5s ease-out;
+        }
+        
+        /* Fade in animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* Pulse animation for loading */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Slide animations */
+        @keyframes slideDown {
+            from { max-height: 0; opacity: 0; }
+            to { max-height: 500px; opacity: 1; }
+        }
+        
+        .slide-down {
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        /* File preview styles */
+        .file-preview {
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            border-radius: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        /* Keyboard shortcuts tooltip */
+        .shortcuts-tooltip {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            max-width: 300px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 min-h-screen text-white" x-data="reportBuilder()" @keydown.window="handleKeydown($event)">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 shadow-sm border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-shield-alt text-2xl text-blue-400 mr-3"></i>
+                        <h1 class="text-xl font-semibold text-white">Vonage - Rakuten Security Report Builder</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-300 hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-gray-700">
+                        <i class="fas fa-home mr-2"></i>Back to Hub
+                    </a>
+                    <button @click="showPage('upload')"
+                           :class="currentPage === 'upload' ? 'text-blue-400 bg-blue-900' : 'text-gray-300 hover:text-blue-400'"
+                           class="px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                        <i class="fas fa-upload mr-2"></i>Upload
+                    </button>
+                    <button @click="showPage('mappings')"
+                           :class="currentPage === 'mappings' ? 'text-blue-400 bg-blue-900' : 'text-gray-300 hover:text-blue-400'"
+                           class="px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                        <i class="fas fa-database mr-2"></i>DID/FC Mapping
+                        <span x-show="savedMapping" class="ml-1 bg-green-500 text-white text-xs px-1 py-0.5 rounded-full">1</span>
+                    </button>
+                    <button @click="showPage('docs')"
+                           :class="currentPage === 'docs' ? 'text-blue-400 bg-blue-900' : 'text-gray-300 hover:text-blue-400'"
+                           class="px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                        <i class="fas fa-book mr-2"></i>Documentation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        
+        <!-- Upload Section -->
+        <div x-show="currentPage === 'upload'" class="space-y-8">
+            <!-- File Upload -->
+            <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
+                <h2 class="text-2xl font-bold text-white mb-6">
+                    <i class="fas fa-cloud-upload-alt mr-2 text-blue-400"></i>
+                    Upload Files
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Raw Data Upload -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Raw Data CSV</label>
+                        <div @drop.prevent="handleDrop($event, 'rawData')"
+                             @dragover.prevent @dragenter.prevent
+                             class="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer bg-gray-700"
+                             :class="{ 'border-blue-400 bg-blue-900/20': rawDataFile, 'border-red-400 bg-red-900/20': errors.rawData }"
+                             @click="document.getElementById('rawDataInput').click()">
+                            <input type="file" id="rawDataInput" @change="handleFileSelect($event, 'rawData')" accept=".csv" class="hidden">
+                            <div x-show="!rawDataFile">
+                                <i class="fas fa-file-csv text-4xl text-gray-400 mb-4"></i>
+                                <p class="text-gray-300">Drop your raw data CSV here or click to browse</p>
+                                <p class="text-sm text-gray-500 mt-2">Max recommended size: 100MB</p>
+                            </div>
+                            <div x-show="rawDataFile" class="text-green-400">
+                                <i class="fas fa-check-circle text-2xl mb-2"></i>
+                                <p x-text="rawDataFile?.name" class="font-medium"></p>
+                                <p class="text-sm text-gray-400" x-text="formatFileSize(rawDataFile?.size)"></p>
+                            </div>
+                        </div>
+                        <div x-show="errors.rawData" class="text-red-400 text-sm mt-1" x-text="errors.rawData"></div>
+                        
+                        <!-- File Preview -->
+                        <div x-show="rawDataPreview.length > 0" class="mt-4 fade-in">
+                            <h4 class="text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-eye mr-1"></i>Preview (First 5 rows)
+                            </h4>
+                            <div class="file-preview p-3">
+                                <div class="text-xs font-mono">
+                                    <div class="text-blue-400 mb-1" x-text="'Columns: ' + (rawDataPreview[0] ? Object.keys(rawDataPreview[0]).join(', ') : '')"></div>
+                                    <template x-for="(row, index) in rawDataPreview.slice(0, 3)" :key="index">
+                                        <div class="text-gray-300 truncate" x-text="JSON.stringify(row).substring(0, 100) + '...'"></div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DID/FC Reference Upload -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-sm font-medium text-gray-300">DID/FC Reference</label>
+                            <div class="flex space-x-2">
+                                <button x-show="savedMapping && !usingSavedMapping" 
+                                       @click="useSavedMapping()"
+                                       class="text-xs bg-green-600 hover:bg-green-500 text-white px-2 py-1 rounded transition-colors">
+                                    <i class="fas fa-database mr-1"></i>Use Saved Mapping
+                                </button>
+                                <button x-show="!usingSavedMapping" 
+                                       @click="showPasteDialog = true"
+                                       class="text-xs bg-purple-600 hover:bg-purple-500 text-white px-2 py-1 rounded transition-colors">
+                                    <i class="fas fa-paste mr-1"></i>Paste from Spreadsheet
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Saved Mapping Display -->
+                        <div x-show="usingSavedMapping" class="mb-4 p-4 bg-green-900/30 border border-green-700 rounded-lg">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="flex items-center text-green-300 font-medium mb-1">
+                                        <i class="fas fa-check-circle mr-2"></i>
+                                        Using Saved Mapping
+                                    </div>
+                                    <div class="text-sm text-gray-300">
+                                        <div>Saved: <span x-text="savedMapping?.savedAt"></span></div>
+                                        <div>Entries: <span x-text="savedMapping?.data?.length || 0"></span></div>
+                                    </div>
+                                </div>
+                                <button @click="clearSavedMapping()" 
+                                       class="text-xs text-gray-400 hover:text-red-400 transition-colors">
+                                    <i class="fas fa-times mr-1"></i>Upload New
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Pasted Data Display -->
+                        <div x-show="didFcData && !didFcFile && !usingSavedMapping" class="mb-4 p-4 bg-purple-900/30 border border-purple-700 rounded-lg">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="flex items-center text-purple-300 font-medium mb-1">
+                                        <i class="fas fa-paste mr-2"></i>
+                                        Using Pasted Data
+                                    </div>
+                                    <div class="text-sm text-gray-300">
+                                        <div>Source: Spreadsheet paste</div>
+                                        <div>Entries: <span x-text="didFcData?.length || 0"></span></div>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button @click="savePastedMapping()" 
+                                           class="text-xs text-purple-400 hover:text-purple-300 transition-colors">
+                                        <i class="fas fa-save mr-1"></i>Save Mapping
+                                    </button>
+                                    <button @click="clearPastedMapping()" 
+                                           class="text-xs text-gray-400 hover:text-red-400 transition-colors">
+                                        <i class="fas fa-times mr-1"></i>Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- File Upload Area -->
+                        <div x-show="!usingSavedMapping && (!didFcData || didFcFile)">
+                            <div @drop.prevent="handleDrop($event, 'didFc')"
+                                 @dragover.prevent @dragenter.prevent
+                                 class="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer bg-gray-700"
+                                 :class="{ 'border-blue-400 bg-blue-900/20': didFcFile, 'border-red-400 bg-red-900/20': errors.didFc }"
+                                 @click="document.getElementById('didFcInput').click()">
+                                <input type="file" id="didFcInput" @change="handleFileSelect($event, 'didFc')" accept=".csv" class="hidden">
+                                <div x-show="!didFcFile">
+                                    <i class="fas fa-file-csv text-4xl text-gray-400 mb-4"></i>
+                                    <p class="text-gray-300">Drop your DID/FC reference CSV here or click to browse</p>
+                                    <div x-show="savedMapping" class="mt-2 text-xs text-green-400">
+                                        💡 Or use the "Use Saved Mapping" button above
+                                    </div>
+                                </div>
+                                <div x-show="didFcFile" class="text-green-400">
+                                    <i class="fas fa-check-circle text-2xl mb-2"></i>
+                                    <p x-text="didFcFile?.name" class="font-medium"></p>
+                                    <p class="text-sm text-gray-400" x-text="formatFileSize(didFcFile?.size)"></p>
+                                    <button @click.stop="saveMapping()" 
+                                           class="mt-2 text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded transition-colors">
+                                        <i class="fas fa-save mr-1"></i>Save This Mapping
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div x-show="errors.didFc" class="text-red-400 text-sm mt-1" x-text="errors.didFc"></div>
+                        
+                        <!-- File Preview -->
+                        <div x-show="didFcPreview.length > 0" class="mt-4 fade-in">
+                            <h4 class="text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-eye mr-1"></i>Preview (First 5 rows)
+                            </h4>
+                            <div class="file-preview p-3">
+                                <div class="text-xs font-mono">
+                                    <div class="text-blue-400 mb-1" x-text="'Columns: ' + (didFcPreview[0] ? Object.keys(didFcPreview[0]).join(', ') : '')"></div>
+                                    <template x-for="(row, index) in didFcPreview.slice(0, 3)" :key="index">
+                                        <div class="text-gray-300 truncate" x-text="JSON.stringify(row).substring(0, 100) + '...'"></div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Process Button and Progress -->
+                <div class="flex flex-col items-center space-y-4">
+                    <!-- Progress Bar -->
+                    <div x-show="processing" class="w-full max-w-md fade-in">
+                        <div class="flex justify-between text-sm text-gray-400 mb-2">
+                            <span x-text="progressStatus"></span>
+                            <span x-text="progressPercent + '%'"></span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full progress-fill transition-all duration-300" 
+                                 :style="'width: ' + progressPercent + '%'"></div>
+                        </div>
+                        <div class="text-center text-xs text-gray-400 mt-2">
+                            <span x-text="'Estimated time remaining: ' + estimatedTime"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Process Button -->
+                    <button @click="processFiles()" 
+                            :disabled="!rawDataFile || (!didFcFile && !usingSavedMapping && !didFcData) || processing"
+                            class="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-2 px-6 rounded-lg transition-all duration-200 flex items-center transform hover:scale-105">
+                        <i :class="processing ? 'fas fa-spinner fa-spin' : 'fas fa-play'" class="mr-2"></i>
+                        <span x-text="processing ? 'Processing...' : 'Process Files'"></span>
+                    </button>
+                    
+                    <!-- Keyboard Shortcuts Hint -->
+                    <div class="text-xs text-gray-500 text-center">
+                        <span>💡 Tip: Press </span>
+                        <kbd class="bg-gray-700 px-2 py-1 rounded text-gray-300">Ctrl+P</kbd>
+                        <span> to process files</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Processing Log -->
+            <div x-show="true" class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6 fade-in">
+                <h3 class="text-lg font-semibold text-white mb-4">
+                    <i class="fas fa-terminal mr-2 text-green-400"></i>Processing Log
+                    <span class="text-xs text-gray-400">(<span x-text="logs.length"></span> entries)</span>
+                    <button @click="logs = []" class="float-right text-xs text-gray-400 hover:text-white">
+                        <i class="fas fa-trash mr-1"></i>Clear
+                    </button>
+                </h3>
+                <div class="terminal-log">
+                    <div x-show="logs.length === 0" class="text-gray-500 text-center py-4 italic">
+                        No log entries yet. Upload files or click 'Test Log' to see logs here.
+                    </div>
+                    <div x-show="logs.length > 0">
+                        <template x-for="(log, index) in logs" :key="index">
+                            <div class="mb-2 leading-relaxed text-green-300">
+                                <span class="text-gray-400 mr-3 font-mono text-xs" x-text="log.timestamp || 'N/A'"></span>
+                                <span x-text="log.message || 'Empty log'"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div x-show="results" class="space-y-6">
+                <!-- Success/Error Message -->
+                <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
+                    <div x-show="results?.success" class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-white">
+                            <i class="fas fa-check-circle mr-2 text-green-400"></i>Processing Complete
+                        </h3>
+                        <button @click="downloadCSV()" 
+                               class="bg-green-600 hover:bg-green-500 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center">
+                            <i class="fas fa-download mr-2"></i>Download CSV
+                        </button>
+                    </div>
+                    <div x-show="!results?.success" class="flex items-center mb-2">
+                        <i class="fas fa-exclamation-triangle mr-2 text-red-400"></i>
+                        <h3 class="text-lg font-semibold text-red-300">Processing Error</h3>
+                    </div>
+                    <p x-text="results?.message" :class="results?.success ? 'text-gray-300' : 'text-red-300'"></p>
+                    
+                    <!-- Enhanced Error Details -->
+                    <div x-show="!results?.success && results?.errorDetails" class="mt-4 p-4 bg-gray-700 rounded-lg">
+                        <h4 class="text-sm font-medium text-red-300 mb-2">
+                            <i class="fas fa-exclamation-circle mr-1"></i>Error Details
+                        </h4>
+                        <div class="text-xs text-gray-300 font-mono">
+                            <div x-show="results?.errorDetails?.line" class="mb-1">
+                                Line: <span class="text-red-400" x-text="results.errorDetails.line"></span>
+                            </div>
+                            <div x-show="results?.errorDetails?.column" class="mb-1">
+                                Column: <span class="text-red-400" x-text="results.errorDetails.column"></span>
+                            </div>
+                            <div x-show="results?.errorDetails?.suggestion" class="mt-2 text-blue-300">
+                                💡 Suggestion: <span x-text="results.errorDetails.suggestion"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div x-show="results?.success && results?.stats" class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
+                    <h3 class="text-lg font-semibold text-white mb-4">
+                        <i class="fas fa-chart-bar mr-2 text-blue-400"></i>Processing Statistics
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="stat-card bg-blue-900/50 border border-blue-700 p-4 rounded-lg">
+                            <div class="text-2xl font-bold text-blue-400" x-text="results?.stats?.totalRecords?.toLocaleString()"></div>
+                            <div class="text-sm text-blue-300">Total Records</div>
+                        </div>
+                        <div class="stat-card bg-green-900/50 border border-green-700 p-4 rounded-lg">
+                            <div class="text-2xl font-bold text-green-400" x-text="Object.keys(results?.stats?.originateDistribution || {}).length"></div>
+                            <div class="text-sm text-green-300">Originate Types</div>
+                        </div>
+                        <div class="stat-card bg-purple-900/50 border border-purple-700 p-4 rounded-lg">
+                            <div class="text-2xl font-bold text-purple-400" x-text="Object.keys(results?.stats?.terminateDistribution || {}).length"></div>
+                            <div class="text-sm text-purple-300">Terminate Types</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Duration Matrix -->
+                <div x-show="results?.success && results?.stats?.durationMatrix" class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
+                    <h3 class="text-lg font-semibold text-white mb-4">
+                        <i class="fas fa-table mr-2 text-cyan-400"></i>Call Duration Matrix (Originate × Terminate)
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-700">
+                            <thead>
+                                <tr class="bg-gray-700">
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                        Originate → Terminate
+                                    </th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-cyan-300 uppercase tracking-wider">
+                                        Landline
+                                    </th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-cyan-300 uppercase tracking-wider">
+                                        TFN Bundle
+                                    </th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-blue-300 uppercase tracking-wider border-l border-gray-600">
+                                        Total
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-700">
+                                <template x-for="originate in ['Mobile', 'Toll Free', 'Anonymous', 'Fixed', 'Int\'l']" :key="originate">
+                                    <tr class="hover:bg-gray-750">
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-300" x-text="originate"></td>
+                                        <td class="px-4 py-3 text-sm text-center text-gray-300 font-mono">
+                                            <span x-text="((results?.stats?.durationMatrix[originate]?.['Landline'] || 0)).toLocaleString() + ' sec'"></span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-center text-gray-300 font-mono">
+                                            <span x-text="((results?.stats?.durationMatrix[originate]?.['TFN Bundle'] || 0)).toLocaleString() + ' sec'"></span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-center text-blue-400 font-mono font-semibold border-l border-gray-600">
+                                            <span x-text="(((results?.stats?.durationMatrix[originate]?.['Landline'] || 0) + (results?.stats?.durationMatrix[originate]?.['TFN Bundle'] || 0))).toLocaleString() + ' sec'"></span>
+                                        </td>
+                                    </tr>
+                                </template>
+                                <!-- Total Row -->
+                                <tr class="bg-gray-750 font-semibold border-t-2 border-gray-600">
+                                    <td class="px-4 py-3 text-sm text-gray-200">Total</td>
+                                    <td class="px-4 py-3 text-sm text-center text-cyan-400 font-mono">
+                                        <span x-text="(Object.values(results?.stats?.durationMatrix || {}).reduce((sum, row) => sum + (row['Landline'] || 0), 0)).toLocaleString() + ' sec'"></span>
+                                    </td>
+                                    <td class="px-4 py-3 text-sm text-center text-cyan-400 font-mono">
+                                        <span x-text="(Object.values(results?.stats?.durationMatrix || {}).reduce((sum, row) => sum + (row['TFN Bundle'] || 0), 0)).toLocaleString() + ' sec'"></span>
+                                    </td>
+                                    <td class="px-4 py-3 text-sm text-center text-blue-400 font-mono font-bold border-l border-gray-600">
+                                        <span x-text="(Object.values(results?.stats?.durationMatrix || {}).reduce((sum, row) => sum + (row['Landline'] || 0) + (row['TFN Bundle'] || 0), 0)).toLocaleString() + ' sec'"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 text-xs text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i>Total duration in seconds for each Originate and Terminate combination
+                    </div>
+                </div>
+
+                <!-- Analytics -->
+                <div x-show="results?.analytics" class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6 fade-in">
+                    <h3 class="text-lg font-semibold text-white mb-4">
+                        <i class="fas fa-analytics mr-2 text-orange-400"></i>FC Analytics Summary
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="stat-card bg-orange-900/50 border border-orange-700 p-4 rounded-lg transform hover:scale-105 transition-transform">
+                            <div class="text-2xl font-bold text-orange-400" x-text="results?.analytics?.totalUniqueFCs"></div>
+                            <div class="text-sm text-orange-300">Unique Free Call Codes</div>
+                        </div>
+                        <div class="stat-card bg-blue-900/50 border border-blue-700 p-4 rounded-lg transform hover:scale-105 transition-transform">
+                            <div class="text-2xl font-bold text-blue-400" x-text="results?.analytics?.totalCalls?.toLocaleString()"></div>
+                            <div class="text-sm text-blue-300">Total Calls</div>
+                        </div>
+                        <div class="stat-card bg-green-900/50 border border-green-700 p-4 rounded-lg transform hover:scale-105 transition-transform">
+                            <div class="text-2xl font-bold text-green-400" x-text="results?.analytics?.totalDurationHours?.toFixed(2)"></div>
+                            <div class="text-sm text-green-300">Total Hours</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Interactive Charts -->
+                    <div x-show="results?.analytics?.topFCs?.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-medium text-white mb-3 text-center">Top Free Call Codes by Calls</h4>
+                            <canvas id="callsChart" class="max-h-64"></canvas>
+                        </div>
+                        <div class="bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-medium text-white mb-3 text-center">Top Free Call Codes by Duration</h4>
+                            <canvas id="durationChart" class="max-h-64"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Top FCs Table -->
+                    <div x-show="results?.analytics?.topFCs?.length > 0">
+                        <h4 class="font-medium text-white mb-3">Top 5 Free Call Codes</h4>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full table-auto">
+                                <thead class="bg-gray-700">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase">FC (Free Call)</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase">Calls</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase">Duration (Hours)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-gray-800 divide-y divide-gray-700">
+                                    <template x-for="fc in results?.analytics?.topFCs" :key="fc.FC">
+                                        <tr>
+                                            <td class="px-4 py-2 text-sm font-medium text-white" x-text="fc.FC"></td>
+                                            <td class="px-4 py-2 text-sm text-gray-300" x-text="fc.calls?.toLocaleString()"></td>
+                                            <td class="px-4 py-2 text-sm text-gray-300" x-text="fc.durationHours?.toFixed(2)"></td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Preview -->
+                <div x-show="results?.preview?.length > 0" class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
+                    <h3 class="text-lg font-semibold text-white mb-4">
+                        <i class="fas fa-eye mr-2 text-indigo-400"></i>Data Preview (First 10 Records)
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full table-auto text-sm">
+                            <thead class="bg-gray-700">
+                                <tr>
+                                    <template x-for="column in Object.keys(results?.preview?.[0] || {})" :key="column">
+                                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-300 uppercase tracking-wider" x-text="column"></th>
+                                    </template>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-gray-800 divide-y divide-gray-700">
+                                <template x-for="(row, index) in results?.preview" :key="index">
+                                    <tr>
+                                        <template x-for="(value, key) in row" :key="key">
+                                            <td class="px-3 py-2 text-xs text-gray-200 max-w-xs truncate" x-text="value"></td>
+                                        </template>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- DID/FC Mapping Section -->
+        <div x-show="currentPage === 'mappings'" class="space-y-8">
+            <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
+                <h2 class="text-2xl font-bold text-white mb-6">
+                    <i class="fas fa-database mr-2 text-blue-400"></i>
+                    DID/FC Mapping Management
+                </h2>
+                
+                <!-- Information Box -->
+                <div class="bg-blue-900/30 border-l-4 border-blue-400 p-4 rounded-r-lg mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-blue-300 font-medium mb-1">How Mapping Storage Works</h3>
+                            <p class="text-blue-200 text-sm">
+                                Your DID/FC mappings are saved securely in your browser's local storage. This means:
+                            </p>
+                            <ul class="text-blue-200 text-sm mt-2 space-y-1">
+                                <li>• <strong>Privacy-focused:</strong> Data never leaves your computer or browser</li>
+                                <li>• <strong>Persistent:</strong> Mappings remain saved even after closing the browser</li>
+                                <li>• <strong>Browser-specific:</strong> Each browser stores its own copy of your mappings</li>
+                                <li>• <strong>One mapping limit:</strong> Only one DID/FC mapping can be stored at a time</li>
+                                <li>• <strong>Backup recommended:</strong> Use "Download as CSV" to backup your mappings</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Current Mapping Status -->
+                <div x-show="!savedMapping" class="bg-gray-700 rounded-lg p-6 text-center">
+                    <i class="fas fa-folder-open text-4xl text-gray-400 mb-4"></i>
+                    <h3 class="text-lg font-medium text-white mb-2">No Saved Mapping</h3>
+                    <p class="text-gray-300 mb-4">Create your first DID/FC mapping by uploading a file or pasting data from a spreadsheet.</p>
+                    <div class="flex justify-center space-x-3">
+                        <button @click="showPage('upload')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition-colors">
+                            <i class="fas fa-upload mr-2"></i>Upload File
+                        </button>
+                        <button @click="showPasteDialog = true" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded transition-colors">
+                            <i class="fas fa-paste mr-2"></i>Paste from Spreadsheet
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Saved Mapping Display -->
+                <div x-show="savedMapping" class="space-y-6">
+                    <div class="bg-green-900/20 border border-green-700 rounded-lg p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-medium text-white mb-2">
+                                    <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                                    Saved Mapping
+                                </h3>
+                                <div class="text-sm text-gray-300 space-y-1">
+                                    <div>
+                                        <span class="font-medium">Saved:</span> 
+                                        <span x-text="savedMapping?.savedAt"></span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Entries:</span> 
+                                        <span x-text="savedMapping?.data?.length || 0"></span> DID/FC pairs
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">File Size:</span> 
+                                        <span x-text="savedMapping?.fileSize"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button @click="deleteSavedMapping()" 
+                                   class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded transition-colors">
+                                <i class="fas fa-trash mr-2"></i>Delete Mapping
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Full Mapping Data -->
+                    <div class="bg-gray-700 rounded-lg p-6">
+                        <h4 class="text-md font-medium text-white mb-4">
+                            <i class="fas fa-table mr-2"></i>Complete Mapping Data
+                        </h4>
+                        <div class="bg-gray-900 rounded border border-gray-600 overflow-hidden max-h-96 overflow-y-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-800 sticky top-0">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase">#</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase">DID</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase">FC (Free Call)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-600">
+                                    <template x-for="(row, index) in (savedMapping?.data || [])" :key="index">
+                                        <tr class="hover:bg-gray-800">
+                                            <td class="px-4 py-2 text-xs text-gray-400" x-text="index + 1"></td>
+                                            <td class="px-4 py-2 text-gray-300 font-mono" x-text="row.DID || row.did"></td>
+                                            <td class="px-4 py-2 text-gray-300 font-mono" x-text="row.FC || row.fc"></td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-2 text-xs text-gray-400 text-center">
+                            Showing all <span x-text="(savedMapping?.data?.length || 0)"></span> DID/FC mappings
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="flex justify-between">
+                        <button @click="downloadMapping()" 
+                               class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition-colors">
+                            <i class="fas fa-download mr-2"></i>Download as CSV
+                        </button>
+                        <div class="flex space-x-2">
+                            <button @click="showPage('upload')" 
+                                   class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded transition-colors">
+                                <i class="fas fa-upload mr-2"></i>Upload New
+                            </button>
+                            <button @click="showPasteDialog = true" 
+                                   class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded transition-colors">
+                                <i class="fas fa-paste mr-2"></i>Paste New
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documentation Section -->
+        <div x-show="currentPage === 'docs'" class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-8">
+            <!-- Documentation content will go here in next part -->
+            <div class="mb-8 border-b border-gray-700 pb-6">
+                <h1 class="text-3xl font-bold text-white mb-4">
+                    <i class="fas fa-book mr-3 text-blue-400"></i>Documentation
+                </h1>
+                <div class="bg-blue-900/30 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-blue-300">
+                                <strong>Version 2.2.0</strong> - Modern Web Interface by Romain EDIN
+                            </p>
+                            <p class="text-blue-200 text-sm mt-1">
+                                This tool is provided as-is with no warranty. The developer cannot be held responsible for any issues arising from its use.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Start Guide -->
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-white mb-4">Quick Start - Version 2.2.0</h2>
+                <div class="bg-blue-900/30 border-l-4 border-blue-400 p-4 rounded-r-lg mb-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-star text-blue-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-blue-300 font-medium">New in v2.2.0: Spreadsheet Paste Functionality</p>
+                            <p class="text-blue-200 text-sm mt-1">
+                                Paste DID/FC data directly from Google Sheets, Excel, or any spreadsheet - no file upload needed!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="prose text-gray-300 max-w-none">
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>Upload your <strong class="text-white">Raw Data CSV</strong> using drag & drop or click to browse</li>
+                        <li>Upload your <strong class="text-white">DID/FC Reference CSV</strong> - see instant preview and validation</li>
+                        <li>Watch the <strong class="text-white">real-time progress bar</strong> during processing</li>
+                        <li>View <strong class="text-white">interactive charts</strong> and analytics</li>
+                        <li>Download the processed CSV file directly</li>
+                    </ol>
+                    <div class="mt-4 p-3 bg-gray-700 rounded-lg">
+                        <h4 class="text-white font-medium mb-2">🔥 Pro Tips:</h4>
+                        <ul class="text-sm space-y-1 list-disc list-inside">
+                            <li>Use <kbd class="bg-gray-800 px-1 py-0.5 rounded text-blue-300">Ctrl+P</kbd> to quickly process files</li>
+                            <li>Press <kbd class="bg-gray-800 px-1 py-0.5 rounded text-blue-300">Ctrl+?</kbd> to see all keyboard shortcuts</li>
+                            <li>Watch the Processing Log for real-time feedback</li>
+                            <li>Charts appear automatically after successful processing</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Overview -->
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-white mb-6">
+                    <i class="fas fa-star mr-2 text-yellow-400"></i>Key Features & Capabilities
+                </h2>
+                
+                <!-- Web Interface Features -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-medium text-blue-400 mb-4">🌐 Modern Web Interface (v2.2.0)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-2"><i class="fas fa-upload mr-2 text-green-400"></i>File Upload & Management</h4>
+                            <ul class="text-sm text-gray-300 space-y-1">
+                                <li>• <strong>Drag & Drop:</strong> Intuitive file upload with visual feedback</li>
+                                <li>• <strong>File Validation:</strong> Instant CSV format and size validation (100MB limit)</li>
+                                <li>• <strong>Live Preview:</strong> See file contents and column headers before processing</li>
+                                <li>• <strong>Spreadsheet Paste:</strong> Direct paste from Google Sheets/Excel (NEW v2.2.0)</li>
+                                <li>• <strong>Error Handling:</strong> Clear error messages with suggestions</li>
+                                <li>• <strong>Progress Tracking:</strong> Real-time progress bar with time estimates</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-2"><i class="fas fa-chart-line mr-2 text-blue-400"></i>Interactive Analytics</h4>
+                            <ul class="text-sm text-gray-300 space-y-1">
+                                <li>• <strong>Real-time Charts:</strong> Bar charts for call volume analysis</li>
+                                <li>• <strong>Doughnut Charts:</strong> Duration distribution visualization</li>
+                                <li>• <strong>Top 5 Analytics:</strong> Automated ranking of top Free Call codes</li>
+                                <li>• <strong>Statistics Dashboard:</strong> Key metrics with color-coded cards</li>
+                                <li>• <strong>Data Preview:</strong> First 10 processed records display</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spreadsheet Paste Feature (NEW v2.2.0) -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-medium text-purple-400 mb-4">📋 Spreadsheet Paste Functionality (NEW v2.2.0)</h3>
+                    <div class="bg-purple-900/20 border border-purple-700 rounded-lg p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-white font-medium mb-2">Direct Data Input</h4>
+                                <ul class="text-sm text-gray-300 space-y-1">
+                                    <li>• <strong>Copy from Google Sheets:</strong> Select and copy cells directly</li>
+                                    <li>• <strong>Excel Compatible:</strong> Paste tab-separated values from Excel</li>
+                                    <li>• <strong>CSV Support:</strong> Paste comma-separated data format</li>
+                                    <li>• <strong>Smart Detection:</strong> Auto-detects column headers (DID, FC)</li>
+                                    <li>• <strong>Real-time Parsing:</strong> Instant validation and preview</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-medium mb-2">Workflow Integration</h4>
+                                <ul class="text-sm text-gray-300 space-y-1">
+                                    <li>• <strong>Upload Page:</strong> Paste data for immediate processing</li>
+                                    <li>• <strong>DID/FC Mapping Page:</strong> Paste and save for future use</li>
+                                    <li>• <strong>Context-aware:</strong> Different behavior based on current page</li>
+                                    <li>• <strong>Overwrite Protection:</strong> Confirmation before replacing saved mappings</li>
+                                    <li>• <strong>Error Handling:</strong> Clear feedback for invalid formats</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DID/FC Mapping Management -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-medium text-purple-400 mb-4">🗃️ DID/Free Call Mapping Management</h3>
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-white font-medium mb-2">Persistent Storage</h4>
+                                <ul class="text-sm text-gray-300 space-y-1">
+                                    <li>• <strong>Local Storage:</strong> Save DID/FC mappings in browser</li>
+                                    <li>• <strong>Auto-detection:</strong> Automatically load saved mappings on startup</li>
+                                    <li>• <strong>One-click Usage:</strong> Reuse saved mappings without re-uploading</li>
+                                    <li>• <strong>Management Interface:</strong> Dedicated page for viewing and managing mappings</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-medium mb-2">Data Management</h4>
+                                <ul class="text-sm text-gray-300 space-y-1">
+                                    <li>• <strong>Complete View:</strong> Browse all DID/FC pairs in scrollable table</li>
+                                    <li>• <strong>Export Function:</strong> Download mappings as CSV for backup</li>
+                                    <li>• <strong>Overwrite Protection:</strong> Confirmation dialog before deletion</li>
+                                    <li>• <strong>Metadata Display:</strong> Show save date, file size, entry count</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Processing Engine -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-medium text-green-400 mb-4">⚙️ Advanced Data Processing Engine</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-2">Call Classification</h4>
+                            <ul class="text-sm text-gray-300 space-y-1">
+                                <li>• <strong>Originate Analysis:</strong> Anonymous, Toll Free, Mobile, Fixed, International</li>
+                                <li>• <strong>Terminate Analysis:</strong> TFN Bundle vs. Landline classification</li>
+                                <li>• <strong>Pattern Recognition:</strong> Intelligent number pattern matching</li>
+                                <li>• <strong>Multi-language Support:</strong> Handles Japanese telecom patterns</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-2">Free Call Code Processing</h4>
+                            <ul class="text-sm text-gray-300 space-y-1">
+                                <li>• <strong>Smart Prioritization:</strong> 0120-prefixed codes get priority placement</li>
+                                <li>• <strong>Multi-FC Support:</strong> Handle up to 3 Free Call codes per DID</li>
+                                <li>• <strong>Intelligent Distribution:</strong> Optimal allocation across FC, FC2, FC3 columns</li>
+                                <li>• <strong>Missing Data Handling:</strong> Graceful handling of unmapped DIDs</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Experience -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-medium text-orange-400 mb-4">🎯 Enhanced User Experience</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-2">Keyboard Shortcuts</h4>
+                            <div class="text-sm text-gray-300 space-y-1">
+                                <div>• <kbd class="bg-gray-800 px-1 py-0.5 rounded text-blue-300">Ctrl+U</kbd> Upload raw data file</div>
+                                <div>• <kbd class="bg-gray-800 px-1 py-0.5 rounded text-blue-300">Ctrl+D</kbd> Upload DID/FC reference</div>
+                                <div>• <kbd class="bg-gray-800 px-1 py-0.5 rounded text-blue-300">Ctrl+P</kbd> Process files</div>
+                                <div>• <kbd class="bg-gray-800 px-1 py-0.5 rounded text-blue-300">Ctrl+S</kbd> Download results</div>
+                                <div>• <kbd class="bg-gray-800 px-1 py-0.5 rounded text-blue-300">Ctrl+H</kbd> Toggle documentation</div>
+                                <div>• <kbd class="bg-gray-800 px-1 py-0.5 rounded text-blue-300">Ctrl+?</kbd> Show all shortcuts</div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-2">Dark Theme Interface</h4>
+                            <ul class="text-sm text-gray-300 space-y-1">
+                                <li>• <strong>Eye-friendly Design:</strong> Optimized for extended use</li>
+                                <li>• <strong>High Contrast:</strong> Excellent readability with proper color schemes</li>
+                                <li>• <strong>Responsive Layout:</strong> Works on desktop, tablet, and mobile</li>
+                                <li>• <strong>Smooth Animations:</strong> Subtle transitions and hover effects</li>
+                                <li>• <strong>Professional Styling:</strong> Clean, modern interface design</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Capabilities -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-medium text-red-400 mb-4">🔧 Technical Capabilities</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-2">Performance</h4>
+                            <ul class="text-sm text-gray-300 space-y-1">
+                                <li>• <strong>Client-side Processing:</strong> No server dependencies</li>
+                                <li>• <strong>Large File Support:</strong> Up to 100MB CSV files</li>
+                                <li>• <strong>Memory Efficient:</strong> Optimized for browser processing</li>
+                                <li>• <strong>Fast Processing:</strong> ~1,000 records/second typical speed</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-2">Compatibility</h4>
+                            <ul class="text-sm text-gray-300 space-y-1">
+                                <li>• <strong>Browser Support:</strong> Chrome 80+, Firefox 75+, Safari 13+, Edge 80+</li>
+                                <li>• <strong>No Installation:</strong> Runs entirely in web browser</li>
+                                <li>• <strong>Offline Capable:</strong> Works without internet after loading</li>
+                                <li>• <strong>Cross-platform:</strong> Windows, macOS, Linux compatible</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-2">Security & Privacy</h4>
+                            <ul class="text-sm text-gray-300 space-y-1">
+                                <li>• <strong>Local Processing:</strong> Data never leaves your browser</li>
+                                <li>• <strong>No Cloud Storage:</strong> All processing happens locally</li>
+                                <li>• <strong>Privacy Focused:</strong> No tracking or data collection</li>
+                                <li>• <strong>Secure by Design:</strong> Client-side only architecture</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Output & Analytics -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-medium text-indigo-400 mb-4">📊 Comprehensive Output & Analytics</h3>
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-white font-medium mb-2">Processed Data Output</h4>
+                                <ul class="text-sm text-gray-300 space-y-1">
+                                    <li>• <strong>Enhanced CSV:</strong> Original data + 5 new classification columns</li>
+                                    <li>• <strong>Instant Download:</strong> One-click CSV export functionality</li>
+                                    <li>• <strong>Data Preview:</strong> View first 10 processed records before download</li>
+                                    <li>• <strong>Format Preservation:</strong> Maintains original data integrity</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-medium mb-2">Analytics & Insights</h4>
+                                <ul class="text-sm text-gray-300 space-y-1">
+                                    <li>• <strong>Processing Statistics:</strong> Total records, originate/terminate distributions</li>
+                                    <li>• <strong>Free Call Analytics:</strong> Unique FCs, total calls, duration summaries</li>
+                                    <li>• <strong>Top 5 Rankings:</strong> Most active Free Call codes by volume/duration</li>
+                                    <li>• <strong>Visual Charts:</strong> Interactive bar and doughnut chart displays</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terminal Log -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-medium text-cyan-400 mb-4">📝 Real-time Processing Log</h3>
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-white font-medium mb-2">Live Feedback</h4>
+                                <ul class="text-sm text-gray-300 space-y-1">
+                                    <li>• <strong>Terminal-style Interface:</strong> Professional developer-friendly logging</li>
+                                    <li>• <strong>Timestamped Entries:</strong> Every action logged with precise timing</li>
+                                    <li>• <strong>Color-coded Messages:</strong> Success (green), errors (red), info (blue)</li>
+                                    <li>• <strong>Auto-scroll:</strong> Automatically follows processing progress</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-medium mb-2">Detailed Status</h4>
+                                <ul class="text-sm text-gray-300 space-y-1">
+                                    <li>• <strong>Step-by-step Progress:</strong> Each processing phase clearly indicated</li>
+                                    <li>• <strong>Error Diagnosis:</strong> Detailed error messages with solutions</li>
+                                    <li>• <strong>Performance Metrics:</strong> Processing speed and completion stats</li>
+                                    <li>• <strong>User Guidance:</strong> Helpful tips and keyboard shortcut reminders</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Field Descriptions -->
+            <section>
+                <h2 class="text-2xl font-semibold text-white mb-4">Output Fields</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-700 rounded-lg">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-white border-b border-gray-600">Field</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-white border-b border-gray-600">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            <tr class="bg-blue-900/30">
+                                <td colspan="2" class="px-4 py-2 text-sm font-semibold text-blue-300">Original Fields</td>
+                            </tr>
+                            <tr class="bg-gray-800"><td class="px-4 py-3 text-sm font-medium text-white">account_id, direction, from, to, date_start, date_end, duration</td><td class="px-4 py-3 text-sm text-gray-300">Copied from raw data</td></tr>
+                            <tr class="bg-green-900/30">
+                                <td colspan="2" class="px-4 py-2 text-sm font-semibold text-green-300">Generated Fields</td>
+                            </tr>
+                            <tr class="bg-gray-800">
+                                <td class="px-4 py-3 text-sm font-medium text-white">Originate</td>
+                                <td class="px-4 py-3 text-sm text-gray-300">
+                                    <div class="space-y-1">
+                                        <div><strong>Classification based on 'from' field:</strong></div>
+                                        <div>• <code class="bg-gray-700 px-1 rounded">Anonymous</code>: Contains "Coinline", "Payphone", or starts with "ano"</div>
+                                        <div>• <code class="bg-gray-700 px-1 rounded">Toll Free</code>: Starts with "81800"</div>
+                                        <div>• <code class="bg-gray-700 px-1 rounded">Mobile</code>: Starts with "8170", "8180", or "8190"</div>
+                                        <div>• <code class="bg-gray-700 px-1 rounded">Fixed</code>: Starts with "81" (but not toll free or mobile)</div>
+                                        <div>• <code class="bg-gray-700 px-1 rounded">Int'l</code>: All other numbers (default)</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="bg-gray-800">
+                                <td class="px-4 py-3 text-sm font-medium text-white">Terminate</td>
+                                <td class="px-4 py-3 text-sm text-gray-300">
+                                    <div class="space-y-1">
+                                        <div><strong>Classification based on 'to' field and DID/FC mapping:</strong></div>
+                                        <div>• <code class="bg-gray-700 px-1 rounded">TFN Bundle</code>: The 'to' number exists in DID/FC reference file</div>
+                                        <div>• <code class="bg-gray-700 px-1 rounded">Landline</code>: The 'to' number is not found in DID/FC mapping (default)</div>
+                                        <div class="text-xs text-gray-400 mt-1">Note: TFN Bundle indicates the call terminated to a Toll-Free Number with an assigned Free Call code</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="bg-gray-800">
+                                <td class="px-4 py-3 text-sm font-medium text-white">FC, FC2, FC3</td>
+                                <td class="px-4 py-3 text-sm text-gray-300">
+                                    <div class="space-y-1">
+                                        <div><strong>Free Call code assignment from DID/FC mapping:</strong></div>
+                                        <div>• Looks up 'to' field in DID/FC reference file to find associated Free Call codes</div>
+                                        <div>• If multiple FCs exist for same DID, they are distributed across FC, FC2, FC3 columns</div>
+                                        <div>• <strong>Prioritization:</strong> FCs starting with "0120" are always placed in FC column first</div>
+                                        <div>• Non-0120 FCs fill remaining columns (FC2, FC3) or go to FC if no 0120 codes exist</div>
+                                        <div>• Shows <code class="bg-gray-700 px-1 rounded">NA</code> if no mapping found for the DID</div>
+                                        <div class="text-xs text-gray-400 mt-1">Example: DID has FCs "0120-123456", "0570-789012", "0120-654321" → FC="0120-123456", FC2="0120-654321", FC3="0570-789012"</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Paste Dialog Modal -->
+    <div x-show="showPasteDialog" 
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-1"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-1"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 overflow-y-auto"
+         @keydown.escape="showPasteDialog = false">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" @click="showPasteDialog = false"></div>
+            
+            <!-- Modal dialog -->
+            <div class="inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-gray-800 shadow-xl rounded-lg border border-gray-700">
+                <div class="mb-4">
+                    <h3 class="text-lg font-medium text-white mb-2">
+                        <i class="fas fa-paste mr-2 text-purple-400"></i>
+                        Paste DID/FC Mapping Data
+                    </h3>
+                    <p class="text-sm text-gray-300">
+                        Copy data from Google Sheets, Excel, or any spreadsheet and paste it here. 
+                        Make sure the first row contains headers (DID, FC) and data is in two columns.
+                    </p>
+                </div>
+                
+                <!-- Paste Area -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        Spreadsheet Data (Ctrl+V to paste)
+                    </label>
+                    <textarea 
+                        x-model="pasteData"
+                        @input="processPastedData()"
+                        placeholder="Paste your DID/FC data here...&#10;Example:&#10;DID,FC&#10;81367015962,0120-885485&#10;81367015963,0120-411004"
+                        class="w-full h-40 px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 font-mono"
+                        style="resize: vertical; min-height: 160px;"></textarea>
+                </div>
+                
+                <!-- Data Preview -->
+                <div x-show="pastedDataPreview.length > 0" class="mb-4">
+                    <h4 class="text-sm font-medium text-gray-300 mb-2">
+                        <i class="fas fa-eye mr-1"></i>Data Preview
+                    </h4>
+                    <div class="bg-gray-900 rounded border border-gray-600 p-3 max-h-32 overflow-y-auto">
+                        <div class="text-xs font-mono text-gray-300">
+                            <div class="text-blue-400 mb-2 font-medium" x-text="'Total: ' + pastedDataPreview.length + ' DID/FC mappings detected'"></div>
+                            <div class="text-gray-400 mb-2 text-xs">
+                                <span x-text="pastedDataPreview.filter(r => r.FC || r.fc).length + ' with FC codes'"></span>
+                                <span class="text-orange-400" x-text="', ' + pastedDataPreview.filter(r => !(r.FC || r.fc)).length + ' empty'"></span>
+                            </div>
+                            <div class="text-gray-400 mb-2 text-xs">Showing first 5 entries:</div>
+                            <template x-for="(row, index) in pastedDataPreview.slice(0, 5)" :key="index">
+                                <div class="text-gray-300 py-0.5">
+                                    <span x-text="(row.DID || row.did || 'N/A')"></span>
+                                    <span class="text-gray-500"> → </span>
+                                    <span :class="(row.FC || row.fc) ? 'text-green-400' : 'text-orange-400'"
+                                          x-text="(row.FC || row.fc) || '[Empty]'"></span>
+                                </div>
+                            </template>
+                            <div x-show="pastedDataPreview.length > 5" class="text-gray-400 mt-2 text-xs border-t border-gray-600 pt-2">
+                                + <span x-text="pastedDataPreview.length - 5"></span> additional mappings (use scroll to see all when saved)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Error Display -->
+                <div x-show="pasteError" class="mb-4 p-3 bg-red-900/30 border border-red-700 rounded-lg">
+                    <div class="flex">
+                        <i class="fas fa-exclamation-triangle text-red-400 mt-0.5 mr-2"></i>
+                        <div>
+                            <div class="text-red-300 font-medium">Paste Error</div>
+                            <div class="text-red-200 text-sm" x-text="pasteError"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action buttons -->
+                <div class="flex justify-end space-x-3">
+                    <button @click="showPasteDialog = false; clearPasteData()"
+                            class="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors">
+                        Cancel
+                    </button>
+                    <button @click="usePastedData()"
+                            :disabled="pastedDataPreview.length === 0"
+                            :class="pastedDataPreview.length > 0 ? 'bg-purple-600 hover:bg-purple-500' : 'bg-gray-600 cursor-not-allowed'"
+                            class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors">
+                        <i :class="currentPage === 'mappings' ? 'fas fa-save' : 'fas fa-check'" class="mr-2"></i>
+                        <span x-text="currentPage === 'mappings' ? 'Save This Mapping' : 'Use This Data'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-gray-700 mt-12">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center text-sm text-gray-400">
+                <div>
+                    <span>Version 2.2.0</span> | 
+                    <span>Developed by Romain EDIN</span>
+                </div>
+                <div>
+                    <span class="text-red-400">⚠️</span>
+                    Internal tool - No warranty or liability for issues
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Keyboard Shortcuts Tooltip -->
+    <div x-show="showShortcuts" 
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 transform scale-95"
+         x-transition:enter-end="opacity-1 transform scale-100"
+         x-transition:leave="transition ease-in duration-75"
+         x-transition:leave-start="opacity-1 transform scale-100"
+         x-transition:leave-end="opacity-0 transform scale-95"
+         class="shortcuts-tooltip">
+        <div class="flex justify-between items-center mb-3">
+            <h4 class="font-medium text-white">Keyboard Shortcuts</h4>
+            <button @click="showShortcuts = false" class="text-gray-400 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span class="text-gray-300">Upload Raw Data:</span>
+                <kbd class="bg-gray-800 px-2 py-1 rounded text-blue-300">Ctrl+U</kbd>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-300">Upload DID/FC:</span>
+                <kbd class="bg-gray-800 px-2 py-1 rounded text-blue-300">Ctrl+D</kbd>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-300">Process Files:</span>
+                <kbd class="bg-gray-800 px-2 py-1 rounded text-blue-300">Ctrl+P</kbd>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-300">Download CSV:</span>
+                <kbd class="bg-gray-800 px-2 py-1 rounded text-blue-300">Ctrl+S</kbd>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-300">Show Shortcuts:</span>
+                <kbd class="bg-gray-800 px-2 py-1 rounded text-blue-300">Ctrl+?</kbd>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-300">Toggle Docs:</span>
+                <kbd class="bg-gray-800 px-2 py-1 rounded text-blue-300">Ctrl+H</kbd>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function reportBuilder() {
+            return {
+                // UI State
+                showShortcuts: false,
+                currentPage: 'upload',
+                
+                // Mapping Management
+                savedMapping: null,
+                usingSavedMapping: false,
+                
+                // Paste Functionality
+                showPasteDialog: false,
+                pasteData: '',
+                pastedDataPreview: [],
+                pasteError: '',
+                
+                // Files
+                rawDataFile: null,
+                didFcFile: null,
+                rawData: null,
+                didFcData: null,
+                rawDataPreview: [],
+                didFcPreview: [],
+                
+                // Processing
+                processing: false,
+                progressPercent: 0,
+                progressStatus: 'Initializing...',
+                estimatedTime: 'Calculating...',
+                logs: [],
+                results: null,
+                processedData: null,
+                
+                // Charts
+                callsChart: null,
+                durationChart: null,
+                
+                // Errors
+                errors: {
+                    rawData: '',
+                    didFc: ''
+                },
+                
+                init() {
+                    // Force initialization of logs array
+                    this.logs = [];
+                    
+                    // Check for saved mapping in localStorage
+                    this.loadSavedMapping();
+                    
+                    // Add initial logs
+                    this.addLog('Vonage Rakuten Security Report Builder ready');
+                    this.addLog('Upload your CSV files to begin processing');
+                    this.addLog('💡 Press Ctrl+? to see keyboard shortcuts');
+                    
+                    if (this.savedMapping) {
+                        this.addLog(`📦 Found saved mapping: ${this.savedMapping.data.length} entries`);
+                    }
+                    
+                    // Debug: Force a log to ensure the system works
+                    console.log('Initial logs created:', this.logs.length);
+                    
+                    // Show shortcuts hint after 3 seconds
+                    setTimeout(() => {
+                        if (!this.rawDataFile && !this.didFcFile) {
+                            this.addLog('🎯 Quick tip: Use drag & drop or Ctrl+U/Ctrl+D for uploads');
+                        }
+                    }, 3000);
+                },
+                
+                // File handling
+                handleFileSelect(event, fileType) {
+                    const file = event.target.files[0];
+                    this.processFile(file, fileType);
+                },
+                
+                handleDrop(event, fileType) {
+                    const file = event.dataTransfer.files[0];
+                    this.processFile(file, fileType);
+                },
+                
+                processFile(file, fileType) {
+                    this.clearError(fileType);
+                    
+                    if (!file) return;
+                    
+                    if (!file.name.toLowerCase().endsWith('.csv')) {
+                        this.setError(fileType, 'Only CSV files are allowed');
+                        return;
+                    }
+                    
+                    if (file.size > 100 * 1024 * 1024) {
+                        this.setError(fileType, 'File size should be less than 100MB');
+                        return;
+                    }
+                    
+                    if (fileType === 'rawData') {
+                        this.rawDataFile = file;
+                        this.addLog(`Raw data loaded: ${file.name} (${this.formatFileSize(file.size)})`);
+                    } else {
+                        this.didFcFile = file;
+                        this.addLog(`DID/FC reference loaded: ${file.name} (${this.formatFileSize(file.size)})`);
+                    }
+                },
+                
+                // Main processing function
+                async processFiles() {
+                    if (!this.rawDataFile || (!this.didFcFile && !this.usingSavedMapping && !this.didFcData)) {
+                        this.addLog('ERROR: Raw data file and DID/FC reference required', 'error');
+                        return;
+                    }
+                    
+                    this.processing = true;
+                    this.results = null;
+                    this.addLog('Starting file processing...');
+                    
+                    try {
+                        // Parse CSV files
+                        this.addLog('Parsing raw data CSV...');
+                        this.rawData = await this.parseCSV(this.rawDataFile);
+                        
+                        if (this.usingSavedMapping) {
+                            this.addLog('Using saved DID/FC mapping...');
+                            // didFcData already set from saved mapping
+                        } else if (this.didFcData && !this.didFcFile) {
+                            this.addLog('Using pasted DID/FC mapping...');
+                            // didFcData already set from pasted data
+                        } else {
+                            this.addLog('Parsing DID/FC reference CSV...');
+                            this.didFcData = await this.parseCSV(this.didFcFile);
+                        }
+                        
+                        // Validate and process
+                        this.addLog('Validating data structure...');
+                        if (!this.validateData()) {
+                            return;
+                        }
+                        
+                        this.addLog('Processing records...');
+                        const processedData = this.processData();
+                        
+                        this.addLog('Generating analytics...');
+                        const analytics = this.generateAnalytics(processedData);
+                        
+                        this.addLog('✅ Processing completed successfully!');
+                        
+                        this.processedData = processedData;
+                        this.results = {
+                            success: true,
+                            message: `Successfully processed ${processedData.length} records`,
+                            stats: this.generateStats(processedData),
+                            analytics: analytics,
+                            preview: processedData.slice(0, 10)
+                        };
+                        
+                        // Generate charts after a short delay to ensure DOM is updated
+                        setTimeout(() => {
+                            this.createCharts(analytics);
+                        }, 100);
+                        
+                    } catch (error) {
+                        this.addLog(`❌ Error: ${error.message}`, 'error');
+                        this.results = {
+                            success: false,
+                            message: error.message
+                        };
+                    } finally {
+                        this.processing = false;
+                    }
+                },
+                
+                // CSV parsing
+                parseCSV(file) {
+                    return new Promise((resolve, reject) => {
+                        Papa.parse(file, {
+                            header: true,
+                            skipEmptyLines: true,
+                            complete: (results) => {
+                                if (results.errors.length > 0) {
+                                    reject(new Error(`CSV parsing error: ${results.errors[0].message}`));
+                                } else {
+                                    resolve(results.data);
+                                }
+                            },
+                            error: (error) => reject(error)
+                        });
+                    });
+                },
+                
+                // Data validation
+                validateData() {
+                    const requiredRawColumns = ['account_id', 'direction', 'from', 'to', 'date_start', 'date_end', 'duration'];
+                    const requiredDidColumns = ['DID', 'FC'];
+                    
+                    if (!this.rawData || this.rawData.length === 0) {
+                        this.addLog('❌ Raw data is empty', 'error');
+                        return false;
+                    }
+                    
+                    if (!this.didFcData || this.didFcData.length === 0) {
+                        this.addLog('❌ DID/FC reference data is empty', 'error');
+                        return false;
+                    }
+                    
+                    const rawColumns = Object.keys(this.rawData[0] || {});
+                    const missingRawColumns = requiredRawColumns.filter(col => !rawColumns.includes(col));
+                    
+                    if (missingRawColumns.length > 0) {
+                        this.addLog(`❌ Missing columns in raw data: ${missingRawColumns.join(', ')}`, 'error');
+                        return false;
+                    }
+                    
+                    const didColumns = Object.keys(this.didFcData[0] || {});
+                    const missingDidColumns = requiredDidColumns.filter(col => !didColumns.includes(col));
+                    
+                    if (missingDidColumns.length > 0) {
+                        this.addLog(`❌ Missing columns in DID/FC reference: ${missingDidColumns.join(', ')}`, 'error');
+                        return false;
+                    }
+                    
+                    return true;
+                },
+                
+                // Data processing
+                processData() {
+                    // Create DID to FC mapping
+                    const didFcMapping = {};
+                    this.didFcData.forEach(row => {
+                        const did = String(row.DID || '');
+                        const fc = row.FC && String(row.FC).trim() !== '' ? String(row.FC) : null;
+                        
+                        if (!didFcMapping[did]) {
+                            didFcMapping[did] = [];
+                        }
+                        if (fc) {
+                            didFcMapping[did].push(fc);
+                        }
+                    });
+                    
+                    // Process each record
+                    return this.rawData.map(row => {
+                        const processedRow = {
+                            account_id: row.account_id || '',
+                            direction: row.direction || '',
+                            from: row.from || '',
+                            to: row.to || '',
+                            date_start: row.date_start || '',
+                            date_end: row.date_end || '',
+                            duration: row.duration || ''
+                        };
+                        
+                        // Add Originate classification
+                        processedRow.Originate = this.classifyOriginate(row.from);
+                        
+                        // Add Terminate classification
+                        processedRow.Terminate = this.classifyTerminate(row.to, didFcMapping);
+                        
+                        // Add FC columns
+                        const fcValues = this.getFcValues(row.to, didFcMapping);
+                        processedRow.FC = fcValues[0];
+                        processedRow.FC2 = fcValues[1];
+                        processedRow.FC3 = fcValues[2];
+                        
+                        return processedRow;
+                    });
+                },
+                
+                // Classification functions
+                classifyOriginate(fromNumber) {
+                    if (!fromNumber || fromNumber === '') return '';
+                    
+                    const fromStr = String(fromNumber).toLowerCase();
+                    
+                    if (fromStr === 'coinline/payphone') return 'Anonymous';
+                    if (fromStr.startsWith('81800')) return 'Toll Free';
+                    if (fromStr.startsWith('8170') || fromStr.startsWith('8180') || fromStr.startsWith('8190')) return 'Mobile';
+                    if (fromStr.startsWith('ano')) return 'Anonymous';
+                    if (fromStr.startsWith('81')) return 'Fixed';
+                    
+                    return "Int'l";
+                },
+                
+                classifyTerminate(toNumber, didFcMapping) {
+                    if (!toNumber || toNumber === '') return 'Landline';
+                    
+                    const toStr = String(toNumber);
+                    if (toStr in didFcMapping && didFcMapping[toStr].length > 0) {
+                        return 'TFN Bundle';
+                    }
+                    
+                    return 'Landline';
+                },
+                
+                getFcValues(toNumber, didFcMapping) {
+                    if (!toNumber) return ['NA', 'NA', 'NA'];
+                    
+                    const fcList = didFcMapping[String(toNumber)] || [];
+                    
+                    if (fcList.length === 0) return ['NA', 'NA', 'NA'];
+                    
+                    // Prioritize 0120-prefixed FCs
+                    const fc0120 = fcList.filter(fc => String(fc).startsWith('0120'));
+                    const fcOthers = fcList.filter(fc => !String(fc).startsWith('0120'));
+                    
+                    const prioritizedList = [...fc0120, ...fcOthers];
+                    
+                    return [
+                        prioritizedList[0] || 'NA',
+                        prioritizedList[1] || 'NA',
+                        prioritizedList[2] || 'NA'
+                    ];
+                },
+                
+                // Analytics generation
+                generateAnalytics(processedData) {
+                    const fcAnalytics = {};
+                    
+                    // Process FC, FC2, FC3 columns
+                    ['FC', 'FC2', 'FC3'].forEach(fcCol => {
+                        processedData.forEach(row => {
+                            const fc = row[fcCol];
+                            if (fc && fc !== 'NA') {
+                                if (!fcAnalytics[fc]) {
+                                    fcAnalytics[fc] = { calls: 0, totalDuration: 0 };
+                                }
+                                fcAnalytics[fc].calls += 1;
+                                fcAnalytics[fc].totalDuration += parseFloat(row.duration) || 0;
+                            }
+                        });
+                    });
+                    
+                    const fcArray = Object.entries(fcAnalytics)
+                        .map(([fc, data]) => ({
+                            FC: fc,
+                            calls: data.calls,
+                            durationHours: data.totalDuration / 3600
+                        }))
+                        .sort((a, b) => b.calls - a.calls);
+                    
+                    return {
+                        totalUniqueFCs: fcArray.length,
+                        totalCalls: fcArray.reduce((sum, fc) => sum + fc.calls, 0),
+                        totalDurationHours: fcArray.reduce((sum, fc) => sum + fc.durationHours, 0),
+                        topFCs: fcArray.slice(0, 5)
+                    };
+                },
+                
+                generateStats(processedData) {
+                    const originateDistribution = {};
+                    const terminateDistribution = {};
+                    const durationMatrix = {};
+
+                    processedData.forEach(row => {
+                        const originate = row.Originate;
+                        const terminate = row.Terminate;
+                        const duration = parseInt(row.duration) || 0;
+
+                        originateDistribution[originate] = (originateDistribution[originate] || 0) + 1;
+                        terminateDistribution[terminate] = (terminateDistribution[terminate] || 0) + 1;
+
+                        // Build duration cross-tabulation matrix
+                        if (!durationMatrix[originate]) {
+                            durationMatrix[originate] = {};
+                        }
+                        durationMatrix[originate][terminate] = (durationMatrix[originate][terminate] || 0) + duration;
+                    });
+
+                    return {
+                        totalRecords: processedData.length,
+                        originateDistribution,
+                        terminateDistribution,
+                        durationMatrix
+                    };
+                },
+                
+                // Download functionality
+                downloadCSV() {
+                    if (!this.processedData) return;
+                    
+                    const csv = Papa.unparse(this.processedData);
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    
+                    if (link.download !== undefined) {
+                        const url = URL.createObjectURL(blob);
+                        link.setAttribute('href', url);
+                        link.setAttribute('download', `processed_data_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`);
+                        link.style.visibility = 'hidden';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                    
+                    this.addLog('📥 CSV file downloaded successfully');
+                },
+                
+                // Chart generation
+                createCharts(analytics) {
+                    if (!analytics || !analytics.topFCs || analytics.topFCs.length === 0) return;
+                    
+                    this.destroyCharts();
+                    
+                    const topFCs = analytics.topFCs.slice(0, 5);
+                    const labels = topFCs.map(fc => fc.FC);
+                    const callsData = topFCs.map(fc => fc.calls);
+                    const durationData = topFCs.map(fc => fc.durationHours.toFixed(1));
+                    
+                    // Chart.js configuration for dark theme
+                    const darkTheme = {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#e5e7eb'
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: {
+                                    color: '#9ca3af'
+                                },
+                                grid: {
+                                    color: '#4b5563'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#9ca3af'
+                                },
+                                grid: {
+                                    color: '#4b5563'
+                                }
+                            }
+                        }
+                    };
+                    
+                    // Calls Chart
+                    const callsCtx = document.getElementById('callsChart');
+                    if (callsCtx) {
+                        this.callsChart = new Chart(callsCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Number of Calls',
+                                    data: callsData,
+                                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                                    borderColor: 'rgba(59, 130, 246, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                ...darkTheme,
+                                plugins: {
+                                    ...darkTheme.plugins,
+                                    title: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Duration Chart
+                    const durationCtx = document.getElementById('durationChart');
+                    if (durationCtx) {
+                        this.durationChart = new Chart(durationCtx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Duration (Hours)',
+                                    data: durationData,
+                                    backgroundColor: [
+                                        'rgba(34, 197, 94, 0.8)',
+                                        'rgba(59, 130, 246, 0.8)',
+                                        'rgba(251, 191, 36, 0.8)',
+                                        'rgba(239, 68, 68, 0.8)',
+                                        'rgba(168, 85, 247, 0.8)'
+                                    ],
+                                    borderColor: [
+                                        'rgba(34, 197, 94, 1)',
+                                        'rgba(59, 130, 246, 1)',
+                                        'rgba(251, 191, 36, 1)',
+                                        'rgba(239, 68, 68, 1)',
+                                        'rgba(168, 85, 247, 1)'
+                                    ],
+                                    borderWidth: 2
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: {
+                                            color: '#e5e7eb',
+                                            padding: 10
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                    this.addLog('📊 Interactive charts generated');
+                },
+                
+                destroyCharts() {
+                    if (this.callsChart) {
+                        this.callsChart.destroy();
+                        this.callsChart = null;
+                    }
+                    if (this.durationChart) {
+                        this.durationChart.destroy();
+                        this.durationChart = null;
+                    }
+                },
+                
+                // Keyboard shortcuts handler
+                handleKeydown(event) {
+                    // Check for Ctrl key combinations
+                    if (event.ctrlKey || event.metaKey) {
+                        switch(event.code) {
+                            case 'KeyU':
+                                event.preventDefault();
+                                document.getElementById('rawDataInput').click();
+                                this.addLog('🔄 Raw data upload triggered via keyboard');
+                                break;
+                            case 'KeyD':
+                                event.preventDefault();
+                                document.getElementById('didFcInput').click();
+                                this.addLog('🔄 DID/FC reference upload triggered via keyboard');
+                                break;
+                            case 'KeyP':
+                                event.preventDefault();
+                                if (this.rawDataFile && (this.didFcFile || this.usingSavedMapping || this.didFcData) && !this.processing) {
+                                    this.processFiles();
+                                    this.addLog('▶️ Processing started via keyboard');
+                                }
+                                break;
+                            case 'KeyS':
+                                event.preventDefault();
+                                if (this.processedData) {
+                                    this.downloadCSV();
+                                    this.addLog('💾 Download triggered via keyboard');
+                                }
+                                break;
+                            case 'KeyH':
+                                event.preventDefault();
+                                this.currentPage = this.currentPage === 'docs' ? 'upload' : 'docs';
+                                this.addLog(`📖 Toggled to ${this.currentPage} page`);
+                                break;
+                            case 'Slash':
+                                if (event.shiftKey) { // Ctrl+?
+                                    event.preventDefault();
+                                    this.showShortcuts = !this.showShortcuts;
+                                    this.addLog('⌨️ Keyboard shortcuts toggled');
+                                }
+                                break;
+                        }
+                    }
+                    
+                    // ESC key to close shortcuts
+                    if (event.code === 'Escape') {
+                        this.showShortcuts = false;
+                    }
+                },
+                
+                // Utility functions
+                addLog(message, type = 'info') {
+                    const timestamp = new Date().toLocaleTimeString();
+                    this.logs.push({
+                        id: Date.now(),
+                        timestamp,
+                        message,
+                        type
+                    });
+                    
+                    // Auto-scroll terminal
+                    this.$nextTick(() => {
+                        const terminal = document.querySelector('.terminal-log');
+                        if (terminal) {
+                            terminal.scrollTop = terminal.scrollHeight;
+                        }
+                    });
+                },
+                
+                setError(fileType, message) {
+                    this.errors[fileType] = message;
+                    if (fileType === 'rawData') this.rawDataFile = null;
+                    else this.didFcFile = null;
+                },
+                
+                clearError(fileType) {
+                    this.errors[fileType] = '';
+                },
+                
+                // Navigation function
+                showPage(page) {
+                    this.currentPage = page;
+                    this.addLog(`📄 Switched to ${page} page`);
+                },
+                
+                // Mapping Management Functions
+                loadSavedMapping() {
+                    try {
+                        const saved = localStorage.getItem('didFcMapping');
+                        if (saved) {
+                            this.savedMapping = JSON.parse(saved);
+                        }
+                    } catch (error) {
+                        console.error('Error loading saved mapping:', error);
+                        localStorage.removeItem('didFcMapping');
+                    }
+                },
+                
+                async saveMapping() {
+                    if (!this.didFcFile) {
+                        this.addLog('No DID/FC file to save', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        this.addLog('Saving DID/FC mapping...');
+                        
+                        // Read and parse the file
+                        const text = await this.didFcFile.text();
+                        const parsed = Papa.parse(text, {
+                            header: true,
+                            skipEmptyLines: true
+                        });
+                        
+                        if (parsed.errors.length > 0) {
+                            this.addLog('Error parsing DID/FC file', 'error');
+                            return;
+                        }
+                        
+                        // Create mapping object
+                        const mapping = {
+                            savedAt: new Date().toLocaleString(),
+                            fileName: this.didFcFile.name,
+                            fileSize: this.formatFileSize(this.didFcFile.size),
+                            data: parsed.data
+                        };
+                        
+                        // Save to localStorage
+                        localStorage.setItem('didFcMapping', JSON.stringify(mapping));
+                        this.savedMapping = mapping;
+                        
+                        this.addLog(`✅ Mapping saved: ${mapping.data.length} entries`, 'success');
+                        
+                    } catch (error) {
+                        this.addLog('Failed to save mapping: ' + error.message, 'error');
+                    }
+                },
+                
+                useSavedMapping() {
+                    if (!this.savedMapping) return;
+                    
+                    this.usingSavedMapping = true;
+                    this.didFcFile = null;
+                    this.didFcData = this.savedMapping.data;
+                    this.didFcPreview = this.savedMapping.data.slice(0, 5);
+                    
+                    this.addLog(`Using saved mapping: ${this.savedMapping.data.length} entries`, 'success');
+                },
+                
+                clearSavedMapping() {
+                    this.usingSavedMapping = false;
+                    this.didFcFile = null;
+                    this.didFcData = null;
+                    this.didFcPreview = [];
+                    
+                    this.addLog('Cleared saved mapping selection');
+                },
+                
+                deleteSavedMapping() {
+                    if (!this.savedMapping) return;
+                    
+                    if (confirm('Are you sure you want to delete the saved mapping? This action cannot be undone.')) {
+                        localStorage.removeItem('didFcMapping');
+                        this.savedMapping = null;
+                        this.usingSavedMapping = false;
+                        this.didFcData = null;
+                        this.didFcPreview = [];
+                        
+                        this.addLog('Saved mapping deleted', 'success');
+                    }
+                },
+                
+                downloadMapping() {
+                    if (!this.savedMapping) return;
+                    
+                    try {
+                        // Convert data back to CSV
+                        const csv = Papa.unparse(this.savedMapping.data);
+                        const blob = new Blob([csv], { type: 'text/csv' });
+                        const url = URL.createObjectURL(blob);
+                        
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = 'saved_did_fc_mapping.csv';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                        
+                        this.addLog('Mapping downloaded as CSV', 'success');
+                    } catch (error) {
+                        this.addLog('Failed to download mapping: ' + error.message, 'error');
+                    }
+                },
+                
+                // Paste Functionality
+                processPastedData() {
+                    this.pasteError = '';
+                    this.pastedDataPreview = [];
+                    
+                    if (!this.pasteData.trim()) {
+                        return;
+                    }
+                    
+                    try {
+                        // Parse the pasted data - handle both CSV format and TSV (tab-separated from spreadsheets)
+                        const lines = this.pasteData.trim().split('\n');
+                        if (lines.length < 2) {
+                            this.pasteError = 'Please paste at least a header row and one data row';
+                            return;
+                        }
+                        
+                        // Detect separator (comma or tab)
+                        const firstLine = lines[0];
+                        const separator = firstLine.includes('\t') ? '\t' : ',';
+                        
+                        // Parse headers
+                        const headers = firstLine.split(separator).map(h => h.trim().replace(/"/g, ''));
+                        
+                        // Validate headers
+                        const didCol = headers.findIndex(h => h.toLowerCase().match(/^did$/i));
+                        const fcCol = headers.findIndex(h => h.toLowerCase().match(/^fc$/i));
+                        
+                        if (didCol === -1) {
+                            this.pasteError = 'DID column not found. Please ensure your data has a "DID" header column';
+                            return;
+                        }
+                        
+                        if (fcCol === -1) {
+                            this.pasteError = 'FC column not found. Please ensure your data has an "FC" header column';
+                            return;
+                        }
+                        
+                        // Parse data rows
+                        const dataRows = [];
+                        for (let i = 1; i < lines.length; i++) {
+                            const line = lines[i];
+                            if (!line.trim()) continue; // Skip completely empty lines
+                            
+                            const cells = line.split(separator).map(c => c.trim().replace(/"/g, ''));
+                            
+                            // Ensure we have at least the DID column
+                            if (cells.length >= didCol + 1) {
+                                const row = {};
+                                // Use the original header names for consistency
+                                row[headers[didCol]] = cells[didCol] || '';
+                                row[headers[fcCol]] = cells[fcCol] || '';
+                                
+                                // Also add standardized names for processing
+                                row.DID = cells[didCol] || '';
+                                row.FC = cells[fcCol] || ''; // Allow empty FC values
+                                
+                                // Include all rows with valid DID, even if FC is missing
+                                if (row.DID && row.DID.trim()) {
+                                    dataRows.push(row);
+                                }
+                            }
+                        }
+                        
+                        if (dataRows.length === 0) {
+                            this.pasteError = 'No valid data rows found. Please check your data format';
+                            return;
+                        }
+                        
+                        this.pastedDataPreview = dataRows;
+                        this.addLog(`📋 Processed ${dataRows.length} DID mappings from ${lines.length - 1} data rows (${lines.length} total lines including header)`);
+                        
+                    } catch (error) {
+                        this.pasteError = 'Failed to parse data: ' + error.message;
+                        console.error('Paste parsing error:', error);
+                    }
+                },
+                
+                usePastedData() {
+                    if (this.pastedDataPreview.length === 0) {
+                        this.pasteError = 'No valid data to use';
+                        return;
+                    }
+                    
+                    try {
+                        // Check if we're on the mappings page - if so, save directly
+                        if (this.currentPage === 'mappings') {
+                            this.saveDirectlyFromPaste();
+                        } else {
+                            // Set the data for processing (Upload page behavior)
+                            this.didFcData = this.pastedDataPreview;
+                            this.didFcPreview = this.pastedDataPreview.slice(0, 5);
+                            this.didFcFile = null; // Clear any uploaded file
+                            this.usingSavedMapping = false;
+                            
+                            this.addLog(`✅ Using pasted DID/FC data: ${this.pastedDataPreview.length} entries`, 'success');
+                            
+                            // Show option to save this data
+                            setTimeout(() => {
+                                this.addLog('💡 Tip: You can save this mapping for future use from the DID/FC Mapping page');
+                            }, 1000);
+                        }
+                        
+                        // Close dialog
+                        this.showPasteDialog = false;
+                        this.clearPasteData();
+                        
+                    } catch (error) {
+                        this.pasteError = 'Failed to use pasted data: ' + error.message;
+                    }
+                },
+                
+                clearPasteData() {
+                    this.pasteData = '';
+                    this.pastedDataPreview = [];
+                    this.pasteError = '';
+                },
+                
+                // Enhanced save mapping to handle pasted data
+                async savePastedMapping() {
+                    if (!this.didFcData || this.didFcData.length === 0) {
+                        this.addLog('No DID/FC data to save', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        this.addLog('Saving pasted DID/FC mapping...');
+                        
+                        // Create mapping object from pasted data
+                        const mapping = {
+                            savedAt: new Date().toLocaleString(),
+                            fileName: 'Pasted from spreadsheet',
+                            fileSize: 'N/A (pasted data)',
+                            data: this.didFcData
+                        };
+                        
+                        // Save to localStorage
+                        localStorage.setItem('didFcMapping', JSON.stringify(mapping));
+                        this.savedMapping = mapping;
+                        
+                        this.addLog(`✅ Pasted mapping saved: ${mapping.data.length} entries`, 'success');
+                        
+                    } catch (error) {
+                        this.addLog('Failed to save pasted mapping: ' + error.message, 'error');
+                    }
+                },
+                
+                clearPastedMapping() {
+                    this.didFcData = null;
+                    this.didFcPreview = [];
+                    this.clearPasteData();
+                    this.addLog('Pasted DID/FC data cleared');
+                },
+                
+                saveDirectlyFromPaste() {
+                    try {
+                        // Show confirmation if overwriting existing mapping
+                        if (this.savedMapping && !confirm('This will overwrite your existing saved mapping. Continue?')) {
+                            return;
+                        }
+                        
+                        this.addLog('Saving pasted DID/FC mapping...');
+                        
+                        // Create mapping object from pasted data
+                        const mapping = {
+                            savedAt: new Date().toLocaleString(),
+                            fileName: 'Pasted from spreadsheet',
+                            fileSize: 'N/A (pasted data)',
+                            data: this.pastedDataPreview
+                        };
+                        
+                        // Save to localStorage
+                        localStorage.setItem('didFcMapping', JSON.stringify(mapping));
+                        this.savedMapping = mapping;
+                        
+                        this.addLog(`✅ Mapping saved from pasted data: ${mapping.data.length} entries`, 'success');
+                        
+                    } catch (error) {
+                        this.pasteError = 'Failed to save pasted mapping: ' + error.message;
+                        this.addLog('Failed to save pasted mapping: ' + error.message, 'error');
+                    }
+                },
+                
+                formatFileSize(bytes) {
+                    if (bytes === 0) return '0 Bytes';
+                    const k = 1024;
+                    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                }
+            };
+        }
+        
+        // Enhanced drag and drop with visual feedback
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                document.addEventListener(eventName, e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+            
+            // Enhanced drag visual feedback
+            ['dragenter', 'dragover'].forEach(eventName => {
+                document.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                document.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight(e) {
+                const dropZone = e.target.closest('.border-dashed');
+                if (dropZone) {
+                    dropZone.classList.add('drag-over');
+                }
+            }
+            
+            function unhighlight(e) {
+                const dropZone = e.target.closest('.border-dashed');
+                if (dropZone) {
+                    dropZone.classList.remove('drag-over');
+                }
+            }
+        });
+        
+        // Performance monitoring
+        if ('performance' in window) {
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    const perfData = performance.getEntriesByType('navigation')[0];
+                    console.log(`🚀 Page load time: ${perfData.loadEventEnd - perfData.loadEventStart}ms`);
+                }, 1000);
+            });
+        }
+    </script>
+</body>
+</html>

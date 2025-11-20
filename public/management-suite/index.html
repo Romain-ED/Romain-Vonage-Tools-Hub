@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vonage Management Suite - Coming Soon</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 min-h-screen text-white">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 shadow-sm border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-cogs text-2xl text-yellow-400 mr-3"></i>
+                        <h1 class="text-xl font-semibold text-white">Vonage Management Suite</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-300 hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-gray-700">
+                        <i class="fas fa-home mr-2"></i>Back to Hub
+                    </a>
+                    <span class="px-3 py-1 bg-yellow-500 bg-opacity-20 text-yellow-400 rounded-full text-sm">
+                        v1.3.0
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="text-center mb-12">
+            <div class="inline-block mb-6">
+                <i class="fas fa-tools text-6xl text-yellow-400 animate-pulse"></i>
+            </div>
+            <h2 class="text-4xl font-bold mb-4">Tool Migration In Progress</h2>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                This comprehensive management suite is currently being harmonized for the Tools Hub.
+                Backend conversion and WebSocket integration required.
+            </p>
+        </div>
+
+        <!-- Status Card -->
+        <div class="bg-gray-800 border border-gray-700 rounded-xl p-8 mb-8">
+            <h3 class="text-2xl font-bold mb-6 flex items-center">
+                <i class="fas fa-info-circle text-blue-400 mr-3"></i>
+                Migration Status
+            </h3>
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-400 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold">Original Tool Available</h4>
+                        <p class="text-gray-400 text-sm">The original Python version is in: <code class="bg-gray-700 px-2 py-1 rounded">vonage-management-suite/</code></p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-spinner fa-spin text-yellow-400 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold">Backend Conversion Required</h4>
+                        <p class="text-gray-400 text-sm">Converting FastAPI/Python backend with WebSocket support to Node.js/Express</p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-spinner fa-spin text-yellow-400 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold">Frontend Harmonization</h4>
+                        <p class="text-gray-400 text-sm">Applying consistent Tailwind CSS and Alpine.js patterns with tabbed interface</p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-clock text-gray-400 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold">Testing & Integration</h4>
+                        <p class="text-gray-400 text-sm">VCR deployment configuration and WebSocket testing</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Preview -->
+        <div class="bg-gray-800 border border-gray-700 rounded-xl p-8 mb-8">
+            <h3 class="text-2xl font-bold mb-6 flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-3"></i>
+                What This Tool Will Offer
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-semibold mb-2"><i class="fas fa-key text-yellow-400 mr-2"></i>Unified Authentication</h4>
+                    <p class="text-gray-400 text-sm">Single credential input for all number and subaccount operations</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-2"><i class="fas fa-phone text-yellow-400 mr-2"></i>Number Management</h4>
+                    <p class="text-gray-400 text-sm">Complete number operations: view, search, purchase, and cancel</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-2"><i class="fas fa-sitemap text-yellow-400 mr-2"></i>Subaccount Management</h4>
+                    <p class="text-gray-400 text-sm">Manage subaccounts, balances, and credit transfers</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-2"><i class="fas fa-terminal text-yellow-400 mr-2"></i>Real-time Logging</h4>
+                    <p class="text-gray-400 text-sm">WebSocket-powered live activity logs for all operations</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Temporary Access -->
+        <div class="bg-blue-900 bg-opacity-20 border border-blue-700 rounded-xl p-6 text-center">
+            <i class="fas fa-lightbulb text-blue-400 text-2xl mb-3"></i>
+            <h3 class="text-xl font-bold mb-2">Need to Use This Tool Now?</h3>
+            <p class="text-gray-300 mb-4">
+                The original Python version is still fully functional. Navigate to the project directory and run:
+            </p>
+            <code class="bg-gray-800 px-4 py-2 rounded text-green-400 block mb-4">
+                cd ../vonage-management-suite && ./start.sh
+            </code>
+            <p class="text-gray-400 text-sm">
+                Access at: <a href="http://localhost:8000" class="text-blue-400 hover:underline">http://localhost:8000</a>
+            </p>
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-12 text-center">
+            <a href="/" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-all hover:shadow-lg">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Tools Hub
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-gray-700 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-400">
+            <p class="text-sm">
+                Romain's Vonage Tools Hub | Tool harmonization in progress
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romain's Vonage Tools Hub</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .tool-card {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+        }
+
+        .tool-card:hover .tool-icon {
+            transform: scale(1.1);
+            color: #60a5fa;
+        }
+
+        .tool-icon {
+            transition: all 0.3s ease;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen text-white">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 shadow-lg border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-tools text-2xl text-blue-400 mr-3"></i>
+                        <h1 class="text-xl font-bold gradient-text">Romain's Vonage Tools Hub</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/changelog" class="text-gray-300 hover:text-blue-400 transition-colors">
+                        <i class="fas fa-history mr-2"></i>Changelog
+                    </a>
+                    <a href="/health" target="_blank" class="text-gray-300 hover:text-blue-400 transition-colors">
+                        <i class="fas fa-heartbeat mr-2"></i>Health
+                    </a>
+                    <span class="px-3 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded-full text-sm">
+                        v1.0.1
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-gradient border-b border-gray-700 fade-in">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+            <div class="float inline-block mb-4">
+                <i class="fas fa-rocket text-5xl text-blue-400"></i>
+            </div>
+            <h2 class="text-3xl font-bold mb-3">Welcome to Your Vonage Tools Hub</h2>
+            <p class="text-lg text-gray-400 max-w-2xl mx-auto">
+                A unified collection of powerful web-based utilities for managing Vonage services,
+                reports, and telecommunications data.
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Tools Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <!-- Rakuten Report Builder -->
+            <div class="tool-card rounded-xl p-8 border border-gray-700 fade-in" style="animation-delay: 0.1s">
+                <div class="flex items-start mb-6">
+                    <div class="tool-icon text-5xl text-blue-400 mr-6">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold mb-2">Rakuten Security Report Builder</h3>
+                        <span class="px-2 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded text-xs">v2.2.0</span>
+                    </div>
+                </div>
+                <p class="text-gray-400 mb-6">
+                    Process and analyze call data reports from Rakuten services. Transform raw telecommunications
+                    data into structured analytics with FC (Feature Code) analysis, interactive charts, and duration matrices.
+                </p>
+                <div class="mb-6">
+                    <h4 class="text-sm font-semibold text-gray-300 mb-2">Key Features:</h4>
+                    <ul class="text-sm text-gray-400 space-y-1">
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Drag & drop CSV upload</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Real-time progress tracking</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Interactive visualizations</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Call duration matrix analysis</li>
+                    </ul>
+                </div>
+                <a href="/rakuten-report" class="inline-block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all hover:shadow-lg">
+                    <i class="fas fa-arrow-right mr-2"></i>Launch Tool
+                </a>
+            </div>
+
+            <!-- Report Filtering Tool -->
+            <div class="tool-card rounded-xl p-8 border border-gray-700 fade-in" style="animation-delay: 0.2s">
+                <div class="flex items-start mb-6">
+                    <div class="tool-icon text-5xl text-green-400 mr-6">
+                        <i class="fas fa-filter"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold mb-2">Vonage Reports API Filter Tool</h3>
+                        <span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-xs">v2.0.0</span>
+                    </div>
+                </div>
+                <p class="text-gray-400 mb-6">
+                    Powerful web-based CSV filtering and analysis tool for Vonage API reports. Process large files
+                    with advanced filtering, data analysis, and multiple export formats.
+                </p>
+                <div class="mb-6">
+                    <h4 class="text-sm font-semibold text-gray-300 mb-2">Key Features:</h4>
+                    <ul class="text-sm text-gray-400 space-y-1">
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Advanced filtering with regex support</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Column analysis & visualization</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Multiple export formats (CSV, JSON, Excel)</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Internal fields removal</li>
+                    </ul>
+                </div>
+                <a href="/report-filtering" class="inline-block w-full text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all hover:shadow-lg">
+                    <i class="fas fa-arrow-right mr-2"></i>Launch Tool
+                </a>
+            </div>
+
+            <!-- Number Manager -->
+            <div class="tool-card rounded-xl p-8 border border-gray-700 fade-in" style="animation-delay: 0.3s">
+                <div class="flex items-start mb-6">
+                    <div class="tool-icon text-5xl text-purple-400 mr-6">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold mb-2">Vonage Numbers Manager</h3>
+                        <span class="px-2 py-1 bg-purple-500 bg-opacity-20 text-purple-400 rounded text-xs">v2.2.2</span>
+                    </div>
+                </div>
+                <p class="text-gray-400 mb-6">
+                    Multi-user web interface for managing Vonage phone numbers. View, search, purchase, and
+                    cancel numbers with real-time account balance monitoring and subaccount support.
+                </p>
+                <div class="mb-6">
+                    <h4 class="text-sm font-semibold text-gray-300 mb-2">Key Features:</h4>
+                    <ul class="text-sm text-gray-400 space-y-1">
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>View owned numbers inventory</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Search & purchase available numbers</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Bulk operations support</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Account balance tracking</li>
+                    </ul>
+                </div>
+                <a href="/number-manager" class="inline-block w-full text-center bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all hover:shadow-lg">
+                    <i class="fas fa-arrow-right mr-2"></i>Launch Tool
+                </a>
+            </div>
+
+            <!-- Management Suite -->
+            <div class="tool-card rounded-xl p-8 border border-gray-700 fade-in" style="animation-delay: 0.4s">
+                <div class="flex items-start mb-6">
+                    <div class="tool-icon text-5xl text-yellow-400 mr-6">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold mb-2">Vonage Management Suite</h3>
+                        <span class="px-2 py-1 bg-yellow-500 bg-opacity-20 text-yellow-400 rounded text-xs">v1.3.0</span>
+                    </div>
+                </div>
+                <p class="text-gray-400 mb-6">
+                    Unified web interface combining Number Management and Subaccount Management. Comprehensive
+                    solution for managing phone numbers, subaccounts, and balance transfers in one place.
+                </p>
+                <div class="mb-6">
+                    <h4 class="text-sm font-semibold text-gray-300 mb-2">Key Features:</h4>
+                    <ul class="text-sm text-gray-400 space-y-1">
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Unified authentication</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Subaccount management & transfers</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Real-time activity logging</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Tabbed interface (Numbers/Subaccounts)</li>
+                    </ul>
+                </div>
+                <a href="/management-suite" class="inline-block w-full text-center bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 px-6 rounded-lg transition-all hover:shadow-lg">
+                    <i class="fas fa-arrow-right mr-2"></i>Launch Tool
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-gray-700 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center text-gray-400">
+                <p class="mb-2">
+                    <span class="font-semibold text-white">Romain's Vonage Tools Hub</span> v1.0.1
+                </p>
+                <p class="text-sm">
+                    Developed by <span class="text-blue-400">Romain EDIN</span> |
+                    © 2025 All Rights Reserved
+                </p>
+                <p class="text-xs mt-4 text-gray-500">
+                    ⚠️ These tools are provided as-is with no warranty. Not officially affiliated with Vonage Communications, Inc.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog - Romain's Vonage Tools Hub</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .version-badge {
+            transition: all 0.3s ease;
+        }
+
+        .version-badge:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen text-white">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 shadow-lg border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-history text-2xl text-blue-400 mr-3"></i>
+                        <h1 class="text-xl font-bold gradient-text">Changelog</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-300 hover:text-blue-400 transition-colors">
+                        <i class="fas fa-home mr-2"></i>Back to Hub
+                    </a>
+                    <span class="px-3 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded-full text-sm">
+                        Hub v1.0.1
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Page Header -->
+        <div class="mb-12 fade-in">
+            <h2 class="text-3xl font-bold mb-3">Tools Hub Changelog</h2>
+            <p class="text-lg text-gray-400">
+                Complete version history for all tools in Romain's Vonage Tools Hub
+            </p>
+        </div>
+
+        <!-- Hub Changelog -->
+        <div class="mb-12 fade-in" style="animation-delay: 0.1s">
+            <div class="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                <div class="flex items-center mb-6">
+                    <i class="fas fa-tools text-3xl text-blue-400 mr-4"></i>
+                    <div>
+                        <h3 class="text-2xl font-bold">Romain's Vonage Tools Hub</h3>
+                        <p class="text-gray-400">Unified landing page and infrastructure</p>
+                    </div>
+                </div>
+
+                <!-- Version 1.0.1 -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-3">
+                        <span class="px-3 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded-full text-sm mr-3 version-badge">
+                            v1.0.1
+                        </span>
+                        <span class="text-gray-400 text-sm">2025-11-20</span>
+                        <span class="ml-3 text-green-400 text-xs">Current</span>
+                    </div>
+                    <ul class="space-y-2 text-gray-300 ml-4">
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Added comprehensive changelog page for all tools</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Added changelog navigation link to landing page</li>
+                        <li><i class="fas fa-wrench text-yellow-400 mr-2"></i>Simplified landing page by removing Quick Start Guide</li>
+                        <li><i class="fas fa-wrench text-yellow-400 mr-2"></i>Simplified landing page by removing Features Section</li>
+                        <li><i class="fas fa-wrench text-yellow-400 mr-2"></i>Reduced hero section size and removed statistics</li>
+                        <li><i class="fas fa-wrench text-yellow-400 mr-2"></i>Improved overall page cleanliness and focus</li>
+                    </ul>
+                </div>
+
+                <!-- Version 1.0.0 -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-3">
+                        <span class="px-3 py-1 bg-gray-600 text-gray-300 rounded-full text-sm mr-3 version-badge">
+                            v1.0.0
+                        </span>
+                        <span class="text-gray-400 text-sm">2025-11-20</span>
+                    </div>
+                    <ul class="space-y-2 text-gray-300 ml-4">
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Initial release of unified tools hub</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Modern landing page with tool cards</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Harmonized navigation across all tools</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Express.js server with routing</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>VCR deployment configuration</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Health check endpoints</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Comprehensive documentation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rakuten Report Builder Changelog -->
+        <div class="mb-12 fade-in" style="animation-delay: 0.2s">
+            <div class="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-shield-alt text-3xl text-blue-400 mr-4"></i>
+                        <div>
+                            <h3 class="text-2xl font-bold">Rakuten Security Report Builder</h3>
+                            <p class="text-gray-400">Call data analytics and FC analysis</p>
+                        </div>
+                    </div>
+                    <a href="/rakuten-report" class="text-blue-400 hover:text-blue-300 text-sm">
+                        <i class="fas fa-external-link-alt mr-1"></i>Open Tool
+                    </a>
+                </div>
+
+                <!-- Version 2.2.0 -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-3">
+                        <span class="px-3 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded-full text-sm mr-3 version-badge">
+                            v2.2.0
+                        </span>
+                        <span class="text-gray-400 text-sm">Current</span>
+                    </div>
+                    <ul class="space-y-2 text-gray-300 ml-4">
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Added call duration matrix (Originate × Terminate)</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Enhanced statistics with matrix view</li>
+                        <li><i class="fas fa-wrench text-yellow-400 mr-2"></i>Professional table layout with totals</li>
+                        <li><i class="fas fa-wrench text-yellow-400 mr-2"></i>Better analytics for call pattern analysis</li>
+                    </ul>
+                </div>
+
+                <!-- Version 2.1.1 -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-3">
+                        <span class="px-3 py-1 bg-gray-600 text-gray-300 rounded-full text-sm mr-3 version-badge">
+                            v2.1.1
+                        </span>
+                    </div>
+                    <ul class="space-y-2 text-gray-300 ml-4">
+                        <li><i class="fas fa-wrench text-yellow-400 mr-2"></i>Column name standardization (FD → FC)</li>
+                        <li><i class="fas fa-wrench text-yellow-400 mr-2"></i>Documentation updates</li>
+                        <li><i class="fas fa-wrench text-yellow-400 mr-2"></i>Code cleanup and improved validation</li>
+                    </ul>
+                </div>
+
+                <!-- Version 2.1.0 -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-3">
+                        <span class="px-3 py-1 bg-gray-600 text-gray-300 rounded-full text-sm mr-3 version-badge">
+                            v2.1.0
+                        </span>
+                    </div>
+                    <ul class="space-y-2 text-gray-300 ml-4">
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Spreadsheet paste functionality (Google Sheets/Excel)</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Enhanced mappings page with paste support</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Context-aware behavior based on current page</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Overwrite protection with confirmation dialogs</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Smart CSV/TSV format detection</li>
+                    </ul>
+                </div>
+
+                <!-- Version 2.0.0 -->
+                <div>
+                    <div class="flex items-center mb-3">
+                        <span class="px-3 py-1 bg-gray-600 text-gray-300 rounded-full text-sm mr-3 version-badge">
+                            v2.0.0
+                        </span>
+                    </div>
+                    <ul class="space-y-2 text-gray-300 ml-4">
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Modern standalone HTML application</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Dark theme with modern UI/UX</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Interactive charts and visualizations</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Real-time progress tracking</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Keyboard shortcuts support</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Drag & drop file handling</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Filtering Tool Changelog -->
+        <div class="mb-12 fade-in" style="animation-delay: 0.3s">
+            <div class="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-filter text-3xl text-green-400 mr-4"></i>
+                        <div>
+                            <h3 class="text-2xl font-bold">Vonage Reports API Filter Tool</h3>
+                            <p class="text-gray-400">CSV filtering and analysis</p>
+                        </div>
+                    </div>
+                    <a href="/report-filtering" class="text-blue-400 hover:text-blue-300 text-sm">
+                        <i class="fas fa-external-link-alt mr-1"></i>Open Tool
+                    </a>
+                </div>
+
+                <!-- Version 2.0.0 -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-3">
+                        <span class="px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded-full text-sm mr-3 version-badge">
+                            v2.0.0
+                        </span>
+                        <span class="text-gray-400 text-sm">Current</span>
+                    </div>
+                    <ul class="space-y-2 text-gray-300 ml-4">
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>File information display after upload</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>"Remove Internal Fields" functionality</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Results file info with estimated output size</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Enhanced mobile responsiveness</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Improved dark mode support</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Multiple export formats (CSV, JSON, Excel)</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>AI-powered filter suggestions</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Advanced data analysis features</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Number Manager Changelog -->
+        <div class="mb-12 fade-in" style="animation-delay: 0.4s">
+            <div class="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-phone text-3xl text-purple-400 mr-4"></i>
+                        <div>
+                            <h3 class="text-2xl font-bold">Vonage Numbers Manager</h3>
+                            <p class="text-gray-400">Phone number management</p>
+                        </div>
+                    </div>
+                    <a href="/number-manager" class="text-blue-400 hover:text-blue-300 text-sm">
+                        <i class="fas fa-external-link-alt mr-1"></i>Open Tool
+                    </a>
+                </div>
+
+                <!-- Version 2.2.2 -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-3">
+                        <span class="px-3 py-1 bg-purple-500 bg-opacity-20 text-purple-400 rounded-full text-sm mr-3 version-badge">
+                            v2.2.2
+                        </span>
+                        <span class="text-gray-400 text-sm">Current (Python version)</span>
+                        <span class="ml-3 px-2 py-1 bg-yellow-500 bg-opacity-20 text-yellow-400 rounded text-xs">
+                            Migration in progress
+                        </span>
+                    </div>
+                    <ul class="space-y-2 text-gray-300 ml-4">
+                        <li><i class="fas fa-info-circle text-blue-400 mr-2"></i>Multi-user web interface for managing Vonage phone numbers</li>
+                        <li><i class="fas fa-info-circle text-blue-400 mr-2"></i>View owned numbers, search available numbers</li>
+                        <li><i class="fas fa-info-circle text-blue-400 mr-2"></i>Purchase and cancel numbers with confirmations</li>
+                        <li><i class="fas fa-info-circle text-blue-400 mr-2"></i>Account balance monitoring and subaccount support</li>
+                        <li><i class="fas fa-info-circle text-blue-400 mr-2"></i>Bulk operations for number management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Management Suite Changelog -->
+        <div class="mb-12 fade-in" style="animation-delay: 0.5s">
+            <div class="bg-gray-800 border border-gray-700 rounded-xl p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-cogs text-3xl text-yellow-400 mr-4"></i>
+                        <div>
+                            <h3 class="text-2xl font-bold">Vonage Management Suite</h3>
+                            <p class="text-gray-400">Unified numbers and subaccount management</p>
+                        </div>
+                    </div>
+                    <a href="/management-suite" class="text-blue-400 hover:text-blue-300 text-sm">
+                        <i class="fas fa-external-link-alt mr-1"></i>Open Tool
+                    </a>
+                </div>
+
+                <!-- Version 1.3.0 -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-3">
+                        <span class="px-3 py-1 bg-yellow-500 bg-opacity-20 text-yellow-400 rounded-full text-sm mr-3 version-badge">
+                            v1.3.0
+                        </span>
+                        <span class="text-gray-400 text-sm">Current (Python version)</span>
+                        <span class="ml-3 px-2 py-1 bg-yellow-500 bg-opacity-20 text-yellow-400 rounded text-xs">
+                            Migration in progress
+                        </span>
+                    </div>
+                    <ul class="space-y-2 text-gray-300 ml-4">
+                        <li><i class="fas fa-info-circle text-blue-400 mr-2"></i>Unified authentication for all operations</li>
+                        <li><i class="fas fa-info-circle text-blue-400 mr-2"></i>Complete number management (view, search, purchase, cancel)</li>
+                        <li><i class="fas fa-info-circle text-blue-400 mr-2"></i>Subaccount management with balance monitoring</li>
+                        <li><i class="fas fa-info-circle text-blue-400 mr-2"></i>Credit transfers between accounts</li>
+                        <li><i class="fas fa-info-circle text-blue-400 mr-2"></i>Real-time WebSocket activity logging</li>
+                        <li><i class="fas fa-info-circle text-blue-400 mr-2"></i>Tabbed interface for easy navigation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 fade-in" style="animation-delay: 0.6s">
+            <h3 class="text-lg font-bold mb-4">Legend</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div class="flex items-center">
+                    <i class="fas fa-plus text-green-400 mr-2"></i>
+                    <span class="text-gray-300">New Feature</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-wrench text-yellow-400 mr-2"></i>
+                    <span class="text-gray-300">Improvement</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-bug text-red-400 mr-2"></i>
+                    <span class="text-gray-300">Bug Fix</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle text-blue-400 mr-2"></i>
+                    <span class="text-gray-300">Information</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-times text-red-400 mr-2"></i>
+                    <span class="text-gray-300">Removed</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-shield-alt text-purple-400 mr-2"></i>
+                    <span class="text-gray-300">Security</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-gray-700 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-400">
+            <p class="text-sm">
+                Romain's Vonage Tools Hub | Changelog last updated: 2025-11-20
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
