@@ -1,6 +1,8 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createServer } from 'http';
+import { WebSocketServer } from 'ws';
 import numberManagerRouter from './api/numberManager.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -9,6 +11,13 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.VCR_PORT || 3000;
 const HOST = process.env.VCR_HOST || "0.0.0.0";
+
+// Create HTTP server for WebSocket support
+const server = createServer(app);
+
+// WebSocket server for Number Manager logs
+const wss = new WebSocketServer({ noServer: true });
+const numberManagerClients = new Set();
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
@@ -19,6 +28,49 @@ app.use((req, res, next) => {
 // Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// WebSocket upgrade handler
+server.on('upgrade', (request, socket, head) => {
+    if (request.url === '/number-manager/ws/logs') {
+        wss.handleUpgrade(request, socket, head, (ws) => {
+            numberManagerClients.add(ws);
+
+            console.log('Number Manager WebSocket client connected');
+            ws.send(JSON.stringify({
+                type: 'info',
+                message: 'Connected to Number Manager logs',
+                timestamp: new Date().toISOString()
+            }));
+
+            ws.on('close', () => {
+                numberManagerClients.delete(ws);
+                console.log('Number Manager WebSocket client disconnected');
+            });
+
+            ws.on('error', (error) => {
+                console.error('WebSocket error:', error);
+                numberManagerClients.delete(ws);
+            });
+        });
+    } else {
+        socket.destroy();
+    }
+});
+
+// Broadcast function for Number Manager logs
+export function broadcastNumberManagerLog(message, type = 'info') {
+    const logMessage = JSON.stringify({
+        type: type,
+        message: message,
+        timestamp: new Date().toISOString()
+    });
+
+    numberManagerClients.forEach((client) => {
+        if (client.readyState === 1) { // WebSocket.OPEN
+            client.send(logMessage);
+        }
+    });
+}
 
 // API routes for Number Manager
 app.use('/number-manager', numberManagerRouter);
@@ -41,7 +93,7 @@ app.get('/health', (req, res) => {
         status: 'healthy',
         timestamp: new Date().toISOString(),
         service: 'Romain Vonage Tools Hub',
-        version: '1.0.1',
+        version: '1.1.0',
         tools: {
             'rakuten-report': 'Rakuten Security Report Builder',
             'report-filtering': 'Vonage Reports API Filter Tool',
@@ -52,7 +104,7 @@ app.get('/health', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, HOST, () => {
+server.listen(PORT, HOST, () => {
     console.log(`🚀 Romain Vonage Tools Hub running on ${HOST}:${PORT}`);
     console.log(`📊 Access the application at http://${HOST}:${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
