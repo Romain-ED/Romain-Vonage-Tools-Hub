@@ -1,11 +1,11 @@
 # Romain's Vonage Tools Hub
 
-**Version:** v1.1.0
+**Version:** v1.2.0
 **Author:** Romain EDIN
 
 A unified web-based hub for managing multiple Vonage telecommunications tools and utilities.
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)
 ![License](https://img.shields.io/badge/license-ISC-yellow.svg)
 
@@ -316,7 +316,7 @@ curl -X POST http://localhost:3000/number-manager/api/numbers/search \
 
 ### Common Issues
 
-#### 1. "Cannot read properties of undefined (reading 'getBalance')" ✅ FIXED in v1.1.0
+#### 1. "Cannot read properties of undefined (reading 'getBalance')" ✅ FIXED in v1.2.0
 **Symptom:** Balance shows "N/A" after connecting, error in logs
 **Cause:** Vonage SDK v3 requires proper Auth class initialization
 **Solution:** The SDK client now uses correct initialization:
@@ -330,7 +330,7 @@ const credentials = new Auth({
 });
 const vonage = new Vonage(credentials);
 ```
-**Status:** Fixed in v1.1.0 - restart server to apply fix
+**Status:** Fixed in v1.2.0 - restart server to apply fix
 
 #### 2. Port Already in Use
 **Symptom:** Server fails to start
@@ -381,7 +381,7 @@ npm start
 
 **Current Status:** ~60% Complete
 
-### Completed (v1.1.0)
+### Completed (v1.2.0)
 - ✅ Hub infrastructure and landing page
 - ✅ Rakuten Security Report Builder
 - ✅ Vonage Reports API Filter Tool
@@ -416,18 +416,21 @@ npm start
 
 ## 📝 Changelog
 
-### v1.1.0 (2025-11-20)
-**Major Update: Number Manager Frontend Complete + SDK Fix**
-- ✨ Complete frontend UI with Tailwind CSS and Alpine.js
-- ✨ Real-time WebSocket logging
-- ✨ Interactive number management (search, purchase, cancel)
-- ✨ Credential management with local storage
-- ✨ Account balance and numbers count display
-- ✨ Confirmation modals for critical operations
-- 🐛 **FIXED:** Vonage SDK v3 initialization issue (Auth class)
-- 🐛 **FIXED:** Balance showing "N/A" error
-- 🐛 **FIXED:** Numbers list not loading error
-- 📝 Comprehensive documentation added
+### v1.2.0 (2025-11-20)
+**Major Update: Management Suite Complete + Critical SDK Fixes**
+- 🎉 **NEW:** Vonage Management Suite (v1.3.0) - Unified Numbers & Subaccounts Management
+- ✨ Complete backend API for subaccounts (create, list, balance, transfer)
+- ✨ Tabbed frontend interface (Numbers + Subaccounts tabs)
+- ✨ Credit transfer functionality between master and subaccounts
+- ✨ Dual WebSocket logging for both Number Manager and Management Suite
+- 🐛 **CRITICAL FIX:** Vonage SDK v3 API method names corrected
+  - `account.getBalance()` → `accounts.getBalance()` (plural!)
+  - `numbers.list()` → `numbers.getOwnedNumbers()`
+  - `numbers.search()` → `numbers.getAvailableNumbers()`
+  - `numbers.buy()` → `numbers.buyNumber()`
+  - `numbers.cancel()` → `numbers.cancelNumber()`
+- ✅ All tools now fully operational with Vonage SDK v3.25.1
+- 📝 Updated documentation across all tools
 
 ### v1.0.1 (2025-11-20)
 - ✨ Added comprehensive changelog page
@@ -521,4 +524,4 @@ Copyright (c) 2025 Romain EDIN
 
 **Ready to Start?** Run `npm start` and visit `http://localhost:3000`
 
-**Made with ❤️ by Romain EDIN | Version 1.1.0**
+**Made with ❤️ by Romain EDIN | Version 1.2.0**

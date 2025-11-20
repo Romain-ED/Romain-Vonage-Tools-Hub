@@ -1,6 +1,6 @@
 {
   "name": "romain-vonage-tools-hub",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Unified hub for Romain's Vonage tools - A collection of web-based utilities for managing Vonage services",
   "main": "server.mjs",
   "type": "module",

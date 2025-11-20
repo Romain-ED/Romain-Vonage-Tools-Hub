@@ -54,7 +54,7 @@
                         <i class="fas fa-home mr-2"></i>Back to Hub
                     </a>
                     <span class="px-3 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded-full text-sm">
-                        Hub v1.1.0
+                        Hub v1.2.0
                     </span>
                 </div>
             </div>
@@ -82,14 +82,38 @@
                     </div>
                 </div>
 
-                <!-- Version 1.1.0 -->
+                <!-- Version 1.2.0 -->
                 <div class="mb-6">
                     <div class="flex items-center mb-3">
                         <span class="px-3 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded-full text-sm mr-3 version-badge">
-                            v1.1.0
+                            v1.2.0
                         </span>
                         <span class="text-gray-400 text-sm">2025-11-20</span>
                         <span class="ml-3 text-green-400 text-xs">Current</span>
+                    </div>
+                    <ul class="space-y-2 text-gray-300 ml-4">
+                        <li><i class="fas fa-star text-yellow-400 mr-2"></i><strong>NEW:</strong> Vonage Management Suite (v1.3.0) - Unified Numbers & Subaccounts Management</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Complete backend API for subaccounts (create, list, balance, transfer)</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Tabbed frontend interface (Numbers + Subaccounts)</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Credit transfer between master and subaccounts</li>
+                        <li><i class="fas fa-plus text-green-400 mr-2"></i>Dual WebSocket logging for both managers</li>
+                        <li><i class="fas fa-wrench text-orange-400 mr-2"></i><strong>CRITICAL FIX:</strong> Vonage SDK v3 API method names</li>
+                        <li><i class="fas fa-wrench text-orange-400 mr-2"></i>Fixed: <code class="bg-gray-700 px-2 py-1 rounded">account.getBalance()</code> → <code class="bg-gray-700 px-2 py-1 rounded">accounts.getBalance()</code></li>
+                        <li><i class="fas fa-wrench text-orange-400 mr-2"></i>Fixed: <code class="bg-gray-700 px-2 py-1 rounded">numbers.list()</code> → <code class="bg-gray-700 px-2 py-1 rounded">numbers.getOwnedNumbers()</code></li>
+                        <li><i class="fas fa-wrench text-orange-400 mr-2"></i>Fixed: <code class="bg-gray-700 px-2 py-1 rounded">numbers.search()</code> → <code class="bg-gray-700 px-2 py-1 rounded">numbers.getAvailableNumbers()</code></li>
+                        <li><i class="fas fa-wrench text-orange-400 mr-2"></i>Fixed: <code class="bg-gray-700 px-2 py-1 rounded">numbers.buy()</code> → <code class="bg-gray-700 px-2 py-1 rounded">numbers.buyNumber()</code></li>
+                        <li><i class="fas fa-wrench text-orange-400 mr-2"></i>Fixed: <code class="bg-gray-700 px-2 py-1 rounded">numbers.cancel()</code> → <code class="bg-gray-700 px-2 py-1 rounded">numbers.cancelNumber()</code></li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>All tools now fully operational with Vonage SDK v3.25.1</li>
+                    </ul>
+                </div>
+
+                <!-- Version 1.1.0 -->
+                <div class="mb-6">
+                    <div class="flex items-center mb-3">
+                        <span class="px-3 py-1 bg-gray-500 bg-opacity-20 text-gray-400 rounded-full text-sm mr-3 version-badge">
+                            v1.1.0
+                        </span>
+                        <span class="text-gray-400 text-sm">2025-11-20</span>
                     </div>
                     <ul class="space-y-2 text-gray-300 ml-4">
                         <li><i class="fas fa-plus text-green-400 mr-2"></i>Completed Vonage Numbers Manager frontend (Phase 2/2)</li>
