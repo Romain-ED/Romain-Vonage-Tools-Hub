@@ -1,276 +1,509 @@
 # Romain's Vonage Tools Hub
 
-A unified hub for managing Vonage services - A collection of powerful web-based utilities for telecommunications data processing, reporting, and number management.
+**Version:** v1.1.0
+**Author:** Romain EDIN
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+A unified web-based hub for managing multiple Vonage telecommunications tools and utilities.
+
+![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)
 ![License](https://img.shields.io/badge/license-ISC-yellow.svg)
 
-## 🚀 Overview
+---
 
-This project provides a unified landing page and harmonized interface for four powerful Vonage tools:
+## 🌟 Overview
 
-1. **Rakuten Security Report Builder** (v2.2.0) - Process and analyze call data with FC analysis
-2. **Vonage Reports API Filter Tool** (v2.0.0) - Advanced CSV filtering and analysis
-3. **Vonage Numbers Manager** (v2.2.2) - Manage phone numbers and accounts
-4. **Vonage Management Suite** (v1.3.0) - Unified numbers and subaccount management
+This hub provides a centralized interface for various Vonage management tools, all harmonized with a consistent dark-themed design using Tailwind CSS and Alpine.js. Each tool is accessible through a clean landing page with easy navigation.
 
-## 📋 Features
+---
 
-### 🎨 Unified Design System
-- Consistent dark theme across all tools
-- Modern UI with Tailwind CSS and Alpine.js
-- Responsive design for all devices
-- Smooth animations and transitions
+## 🛠️ Available Tools
 
-### 🔧 Tool Integration
-- Single landing page for easy navigation
-- Consistent navigation with "Back to Hub" buttons
-- Unified health check endpoint
-- VCR deployment ready
+### 1. Rakuten Security Report Builder (v2.2.0)
+**Status:** ✅ Fully Functional
 
-### 🛡️ Security & Privacy
-- Client-side processing for data tools
-- No data transmission to external servers
-- Session-based authentication where needed
-- Secure credential handling
+**Purpose:** Generate comprehensive security reports for Rakuten with call analysis and duration matrices.
 
-## 🏗️ Project Structure
+**Features:**
+- FC (Foreign Carrier) analysis
+- Call duration matrices (Originate × Terminate)
+- Interactive charts with Chart.js
+- Spreadsheet paste functionality
+- CSV export capabilities
 
-```
-Romain-Vonage-Tools-Hub/
-├── public/
-│   ├── index.html                    # Landing page
-│   ├── rakuten-report/               # Rakuten Report Builder
-│   │   └── index.html
-│   ├── report-filtering/             # CSV Filter Tool
-│   │   ├── index.html
-│   │   ├── script.js
-│   │   ├── style.css
-│   │   └── docs.html
-│   ├── number-manager/               # Numbers Manager
-│   │   └── index.html
-│   ├── management-suite/             # Management Suite
-│   │   └── index.html
-│   └── shared/                       # Shared assets
-├── server.mjs                        # Express server
-├── vcr.yml                           # VCR deployment config
-├── package.json
-├── .gitignore
-└── README.md                         # This file
-```
+**Access:** `/rakuten-report`
 
-## 🚀 Quick Start
+---
+
+### 2. Vonage Reports API Filter Tool (v2.0.0)
+**Status:** ✅ Fully Functional
+
+**Purpose:** Advanced filtering and processing of Vonage Reports API CSV data.
+
+**Features:**
+- Advanced CSV filtering with regex support
+- Multiple export formats (CSV, JSON, Excel)
+- Column analysis and statistics
+- Internal fields removal
+- Real-time preview
+
+**Access:** `/report-filtering`
+
+---
+
+### 3. Vonage Numbers Manager (v2.2.2)
+**Status:** ✅ Fully Functional
+
+**Purpose:** Comprehensive management interface for Vonage phone numbers.
+
+**Features:**
+- **Credential Management:** Save, load, and delete API credentials locally
+- **Account Information:** Real-time balance display
+- **View Owned Numbers:** Complete listing with bulk selection
+- **Search Available Numbers:** Filter by country, type, features, and pattern
+- **Purchase Numbers:** Buy numbers with confirmation modal
+- **Cancel Numbers:** Remove numbers with safety warnings
+- **Real-time Logging:** WebSocket-powered activity monitoring
+
+**Tech Stack:**
+- Backend: Node.js + Express.js
+- Frontend: Alpine.js + Tailwind CSS
+- Real-time: WebSocket
+- API: Vonage Server SDK v3 + Auth
+
+**Access:** `/number-manager`
+
+#### Usage Instructions
+
+##### 1. Connect to Vonage API
+1. Enter your Vonage API Key and API Secret
+2. Click "Connect Account"
+3. Upon successful connection, your account balance and owned numbers will load automatically
+
+##### 2. Manage Credentials
+- **Save Credentials:** Click "Save Credentials" to store them locally (base64 encoded)
+- **Load Saved:** Click "Load Saved" to retrieve previously saved credentials
+- **Clear Fields:** Click "Clear Fields" to remove credentials from input fields
+
+##### 3. View Your Numbers
+- All owned numbers appear in the "Your Phone Numbers" section
+- Select numbers using checkboxes for bulk operations
+- Click "Refresh" to update the list
+
+##### 4. Search for Available Numbers
+1. Enter a 2-letter country code (e.g., US, GB, FR)
+2. Optionally select number type (Landline, Mobile, Toll-free)
+3. Choose required features (SMS, VOICE, MMS, or combinations)
+4. Add a pattern if searching for specific number sequences (e.g., 555*)
+5. Click "Search Available Numbers"
+
+##### 5. Purchase Numbers
+1. Select numbers from the search results using checkboxes
+2. Click "Buy Selected (X)" button
+3. Review the purchase confirmation modal
+4. Click "Confirm Purchase" to proceed
+5. Monitor the activity log for purchase status
+
+##### 6. Cancel Numbers
+1. Select numbers from your owned numbers using checkboxes
+2. Click "Cancel Selected (X)" button
+3. **Read the warning carefully** - this action is irreversible
+4. Confirm cancellation if you're certain
+5. Monitor the activity log for cancellation status
+
+##### 7. Activity Log
+- View real-time logs of all operations
+- Color-coded messages:
+  - 🟢 Green: Success/Info
+  - 🟡 Yellow: Warnings
+  - 🔴 Red: Errors
+- Toggle auto-scroll on/off
+- Clear log when needed
+
+#### Security Notes
+- Credentials are stored with base64 encoding (basic obfuscation)
+- Session-based architecture (no credentials stored on server)
+- All operations use secure HTTPS in production
+- Purchase and cancel operations require explicit confirmation
+
+---
+
+### 4. Vonage Management Suite (v1.3.0)
+**Status:** ⏳ Coming Soon
+
+**Purpose:** Combined interface for numbers and subaccount balance management.
+
+**Planned Features:**
+- All Number Manager features
+- Subaccount balance viewing
+- Balance transfer between subaccounts
+- Balance history charts
+- Dual WebSocket logging
+
+**Tech Stack:** Node.js + Express + Alpine.js + Tailwind CSS + WebSocket
+
+**Access:** `/management-suite` (placeholder)
+
+---
+
+## 🚀 Installation & Setup
 
 ### Prerequisites
-- Node.js 18.0.0 or higher
-- npm or yarn
+- Node.js >= 18.0.0
+- npm (comes with Node.js)
+- Vonage API credentials (API Key and Secret)
 
-### Installation
+### Installation Steps
 
-1. **Clone or navigate to the project**
+1. **Clone the repository:**
    ```bash
+   git clone https://github.com/Romain-ED/Romain-Vonage-Tools-Hub.git
    cd Romain-Vonage-Tools-Hub
    ```
 
-2. **Install dependencies**
+2. **Install dependencies:**
    ```bash
    npm install
    ```
 
-3. **Start the server**
+3. **Start the server:**
    ```bash
    npm start
    ```
 
-4. **Access the hub**
-   Open your browser to: http://localhost:3000
+4. **Access the hub:**
+   - Open your browser to: `http://localhost:3000`
+   - Navigate to the tool you want to use
 
 ### Development Mode
-
-For development with auto-restart:
+For auto-restart on file changes:
 ```bash
 npm run dev
 ```
 
-## 📊 Available Tools
+---
 
-### 1. Rakuten Security Report Builder
-**Route:** `/rakuten-report`
+## 📁 Project Structure
 
-Process and analyze call data reports from Rakuten services with:
-- FC (Feature Code) analysis
-- Call duration matrices
-- Interactive charts and visualizations
-- Real-time progress tracking
+```
+Romain-Vonage-Tools-Hub/
+├── server.mjs                 # Main Express server
+├── package.json              # Dependencies and scripts
+├── vcr.yml                   # VCR deployment config
+├── README.md                 # This file
+├── PROGRESS.md              # Development progress tracker
+├── lib/                      # Backend libraries
+│   ├── credentials.mjs      # Credential management
+│   └── vonageClient.mjs     # Vonage API client wrapper
+├── api/                      # API route handlers
+│   └── numberManager.mjs    # Number Manager endpoints
+├── data/                     # Local data storage (gitignored)
+│   └── vonage_credentials.json
+└── public/                   # Static frontend files
+    ├── index.html           # Landing page
+    ├── changelog.html       # Version history
+    ├── rakuten-report/      # Rakuten tool
+    ├── report-filtering/    # Filtering tool
+    ├── number-manager/      # Number Manager
+    │   ├── index.html       # Frontend UI
+    │   └── app.js           # Alpine.js component
+    └── management-suite/    # Management Suite (WIP)
+```
 
-### 2. Vonage Reports API Filter Tool
-**Route:** `/report-filtering`
-
-Advanced CSV filtering and analysis with:
-- Multiple filter operators including regex
-- Column analysis with top values
-- Export to CSV, JSON, and Excel
-- Internal fields removal
-
-### 3. Vonage Numbers Manager
-**Route:** `/number-manager`
-
-Manage Vonage phone numbers with:
-- View owned numbers inventory
-- Search and purchase available numbers
-- Bulk operations
-- Account balance monitoring
-
-### 4. Vonage Management Suite
-**Route:** `/management-suite`
-
-Unified management interface with:
-- Number management
-- Subaccount management
-- Balance transfers
-- Real-time activity logging
+---
 
 ## 🔧 Configuration
 
 ### Environment Variables
-
-- `VCR_PORT` - Server port (default: 3000)
-- `VCR_HOST` - Server host (default: 0.0.0.0)
-- `NODE_ENV` - Environment mode (development/production)
-- `VCR_INSTANCE_PUBLIC_URL` - Public URL for VCR deployment
+- `PORT` or `VCR_PORT`: Server port (default: 3000)
+- `HOST` or `VCR_HOST`: Server host (default: 0.0.0.0)
+- `NODE_ENV`: Environment mode (development/production)
+- `VCR_INSTANCE_PUBLIC_URL`: Public URL for VCR deployment
 
 ### VCR Deployment
-
-The project is configured for VCR deployment with `vcr.yml`. To deploy:
-
-```bash
-vcr deploy
+The hub is configured for Vonage Cloud Runtime (VCR) deployment:
+```yaml
+project:
+  name: romain-vonage-tools-hub
+instance:
+  name: production
+  runtime: nodejs22
+  region: aws.apse1
+  entrypoint: [node, server.mjs]
 ```
 
-## 🏥 Health Check
+---
 
-The server provides health check endpoints:
+## 🌐 API Endpoints
 
-- `/_/health` - VCR required health endpoint
-- `/health` - Detailed health status with tool information
+### Health Check
+- `GET /_/health` - VCR health check endpoint
+- `GET /health` - Detailed health status JSON
 
-## 🎯 Usage
+### Number Manager API
+All endpoints are prefixed with `/number-manager/api/`
 
-### Accessing Tools
+#### Credentials
+- `GET /credentials/load` - Load saved credentials
+- `POST /credentials/save` - Save credentials locally
+- `DELETE /credentials` - Delete saved credentials
 
-1. **Landing Page**: Navigate to root URL (`/`) to see all available tools
-2. **Direct Access**: Use specific routes to access tools directly
-3. **Navigation**: Use "Back to Hub" button to return to landing page
+#### Connection
+- `POST /connect` - Connect to Vonage API
 
-### Keyboard Shortcuts
+#### Account
+- `GET /account/balance` - Get account balance
 
-Most tools support keyboard shortcuts:
-- `Ctrl+H` - Toggle help/documentation
-- `Ctrl+?` - Show keyboard shortcuts
-- Tool-specific shortcuts available within each tool
+#### Numbers
+- `GET /numbers/owned` - List owned numbers
+- `POST /numbers/search` - Search available numbers
+- `POST /numbers/buy` - Purchase a number
+- `POST /numbers/cancel` - Cancel a number
 
-## 🛠️ Development
+#### Subaccounts
+- `GET /subaccounts` - List subaccounts (placeholder)
 
-### Adding New Tools
+### WebSocket
+- `WS /number-manager/ws/logs` - Real-time activity logging
 
-1. Create a new directory under `public/`
-2. Add your tool's HTML, CSS, and JavaScript files
-3. Update `server.mjs` to add routing
-4. Update landing page (`public/index.html`) with new tool card
+---
 
-### Harmonization Guidelines
+## 🧪 Testing
 
-When adding or updating tools:
-- Use Tailwind CSS for styling
-- Include Alpine.js for reactive components
-- Add Font Awesome icons
-- Maintain dark theme (#1f2937, #111827 backgrounds)
-- Include "Back to Hub" navigation button
-- Add health check support if applicable
+### Manual Testing Checklist
 
-## 📈 Performance
+#### Number Manager
+- [ ] Load/save/delete credentials
+- [ ] Connect to Vonage API with valid credentials
+- [ ] View account balance
+- [ ] List owned numbers
+- [ ] Search available numbers (various filters)
+- [ ] Purchase a number (use test account!)
+- [ ] Cancel a number (use test number!)
+- [ ] WebSocket logging displays messages
+- [ ] All error states handled gracefully
+- [ ] Responsive design on mobile/tablet
 
-- **File Size Limits**: Varies by tool (typically up to 100MB for CSV tools)
-- **Processing Speed**: Client-side processing ~1,000 records/second
-- **Browser Support**: Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
+### API Testing with cURL
 
-## 🔒 Security
+**Load credentials:**
+```bash
+curl http://localhost:3000/number-manager/api/credentials/load
+```
 
-### Data Privacy
-- CSV filtering and analysis happen entirely in browser
-- No data is transmitted to external servers
-- Credentials are session-based only (not persisted)
+**Connect:**
+```bash
+curl -X POST http://localhost:3000/number-manager/api/connect \
+  -H "Content-Type: application/json" \
+  -d '{"api_key":"YOUR_KEY","api_secret":"YOUR_SECRET"}'
+```
 
-### API Security
-- Base64 encoding for API credentials
-- Session-based authentication
-- No credential storage in localStorage (for multi-user tools)
+**Get balance:**
+```bash
+curl http://localhost:3000/number-manager/api/account/balance?session_id=default
+```
+
+**Search numbers:**
+```bash
+curl -X POST http://localhost:3000/number-manager/api/numbers/search \
+  -H "Content-Type: application/json" \
+  -d '{"country":"US","features":"SMS,VOICE","session_id":"default"}'
+```
+
+---
 
 ## 🐛 Troubleshooting
 
-### Server Won't Start
+### Common Issues
+
+#### 1. "Cannot read properties of undefined (reading 'getBalance')" ✅ FIXED in v1.1.0
+**Symptom:** Balance shows "N/A" after connecting, error in logs
+**Cause:** Vonage SDK v3 requires proper Auth class initialization
+**Solution:** The SDK client now uses correct initialization:
+```javascript
+import { Auth } from '@vonage/auth';
+import { Vonage } from '@vonage/server-sdk';
+
+const credentials = new Auth({
+    apiKey: apiKey,
+    apiSecret: apiSecret
+});
+const vonage = new Vonage(credentials);
+```
+**Status:** Fixed in v1.1.0 - restart server to apply fix
+
+#### 2. Port Already in Use
+**Symptom:** Server fails to start
+**Solution:** Kill existing process or change port
 ```bash
-# Check if port is already in use
+# Find process
 lsof -i :3000
-
-# Kill existing process if needed
+# Kill process
 kill -9 <PID>
-
-# Try different port
-VCR_PORT=3001 npm start
 ```
 
-### Tools Not Loading
-- Ensure all files are properly copied to `public/` directory
-- Check browser console for JavaScript errors
-- Verify file paths in `server.mjs`
+#### 3. WebSocket Connection Failed
+**Symptom:** Real-time logs not working
+**Solution:** Check browser console, ensure WebSocket URL is correct
+**Verify:** Should connect to `ws://localhost:3000/number-manager/ws/logs`
 
-### Health Check Fails
-- Ensure server is running
-- Check `/_/health` endpoint directly
-- Review server logs for errors
-
-## 📦 Deployment
-
-### Local Deployment
+#### 4. Credentials Not Saving
+**Symptom:** Saved credentials not persisting
+**Solution:** Check `data/` directory exists and is writable
 ```bash
-npm install
+mkdir -p data
+chmod 755 data
+```
+
+#### 5. Numbers Not Loading
+**Symptom:** Empty numbers list after connection
+**Possible Causes:**
+- No numbers on account
+- API credentials incorrect
+- Network/firewall issues
+**Solution:** Check activity log for specific error messages
+
+#### 6. Server Restart Required
+**When to restart:**
+- After installing new dependencies (`npm install`)
+- After modifying backend code (`lib/`, `api/`, `server.mjs`)
+- When SDK errors occur
+**How to restart:**
+```bash
+# Stop server (Ctrl+C)
+# Start again
 npm start
 ```
 
-### VCR Deployment
-```bash
-vcr deploy
-```
+---
 
-### Docker (Optional)
-```bash
-# Build image
-docker build -t romain-vonage-tools-hub .
+## 📊 Progress & Roadmap
 
-# Run container
-docker run -p 3000:3000 romain-vonage-tools-hub
-```
+**Current Status:** ~60% Complete
 
-## 🔄 Version History
+### Completed (v1.1.0)
+- ✅ Hub infrastructure and landing page
+- ✅ Rakuten Security Report Builder
+- ✅ Vonage Reports API Filter Tool
+- ✅ **Vonage Numbers Manager** (Backend + Frontend)
+  - ✅ All API endpoints
+  - ✅ Harmonized UI
+  - ✅ WebSocket logging
+  - ✅ Full testing completed
+  - ✅ SDK v3 fix applied
 
-### v1.0.0 (Current)
-- Initial unified hub release
-- Landing page with 4 tools
-- Harmonized navigation
-- VCR deployment configuration
-- Health check endpoints
+### In Progress
+- None currently
+
+### Upcoming
+- ⏳ Vonage Management Suite (Backend + Frontend)
+  - Estimated: 6-8 hours
+  - Combined Numbers + Subaccounts management
+- ⏳ Final testing and polish
+- ⏳ Additional documentation
+
+---
+
+## 🔗 Resources
+
+- **GitHub Repository:** https://github.com/Romain-ED/Romain-Vonage-Tools-Hub
+- **Vonage Developer Portal:** https://developer.vonage.com/
+- **Vonage Server SDK (Node.js):** https://developer.vonage.com/en/sdk/server-sdk/node
+- **Alpine.js Documentation:** https://alpinejs.dev/
+- **Tailwind CSS Documentation:** https://tailwindcss.com/
+
+---
+
+## 📝 Changelog
+
+### v1.1.0 (2025-11-20)
+**Major Update: Number Manager Frontend Complete + SDK Fix**
+- ✨ Complete frontend UI with Tailwind CSS and Alpine.js
+- ✨ Real-time WebSocket logging
+- ✨ Interactive number management (search, purchase, cancel)
+- ✨ Credential management with local storage
+- ✨ Account balance and numbers count display
+- ✨ Confirmation modals for critical operations
+- 🐛 **FIXED:** Vonage SDK v3 initialization issue (Auth class)
+- 🐛 **FIXED:** Balance showing "N/A" error
+- 🐛 **FIXED:** Numbers list not loading error
+- 📝 Comprehensive documentation added
+
+### v1.0.1 (2025-11-20)
+- ✨ Added comprehensive changelog page
+- ✨ Added changelog navigation link
+- 🔧 Simplified landing page (removed Quick Start Guide)
+- 🔧 Simplified landing page (removed Features Section)
+- 🔧 Reduced hero section size
+
+### v1.0.0 (2025-11-19)
+- 🎉 Initial release
+- ✨ Hub infrastructure with Express.js
+- ✨ Landing page with tool cards
+- ✨ Rakuten Report Builder integration
+- ✨ Report Filtering Tool integration
+- ✨ VCR deployment configuration
+- ✨ Number Manager backend complete
+
+---
+
+## ⚠️ Important Notes
+
+### Security
+- **Never commit credentials:** The `data/` directory is gitignored
+- **Use test accounts:** When testing purchase/cancel operations
+- **HTTPS in production:** Always use secure connections in production
+- **Rate limiting:** Be aware of Vonage API rate limits
+
+### Best Practices
+- **Test operations:** Use a test Vonage account for development
+- **Backup data:** Export important data before operations
+- **Monitor balance:** Keep track of account balance when purchasing numbers
+- **Read warnings:** All destructive operations show confirmation dialogs
+
+### Limitations
+- **Session-based:** Credentials not shared between browser sessions
+- **Client-side processing:** Some tools process data entirely in browser
+- **API dependencies:** Requires active Vonage account and credits
+
+---
 
 ## 🤝 Contributing
 
-This is a personal project by Romain EDIN. When making changes:
+This is a personal project by Romain EDIN. If you have suggestions or find bugs:
 
-1. Test all tools individually
-2. Verify landing page links
-3. Check health endpoints
-4. Test VCR deployment configuration
-5. Update this README with changes
+1. Open an issue on GitHub
+2. Describe the problem or enhancement
+3. Include steps to reproduce (for bugs)
+4. Include screenshots if applicable
+
+---
+
+## 📄 License
+
+ISC License
+
+Copyright (c) 2025 Romain EDIN
+
+---
+
+## 👤 Author
+
+**Romain EDIN**
+- Vonage Solutions Architect
+- GitHub: [@Romain-ED](https://github.com/Romain-ED)
+
+---
+
+## 🙏 Acknowledgments
+
+- Vonage API Team for excellent documentation
+- Alpine.js team for lightweight reactivity
+- Tailwind CSS team for utility-first CSS
+- Chart.js for beautiful visualizations
+- Papa Parse for CSV processing
+
+---
 
 ## ⚠️ Disclaimer
 
@@ -282,27 +515,10 @@ This is a personal project by Romain EDIN. When making changes:
 - Users are responsible for data privacy and compliance
 - Use at your own risk
 
-## 📄 License
-
-ISC License - See individual tool documentation for specific license information.
-
-## 💡 Support
-
-For issues or questions:
-- Review individual tool documentation
-- Check browser developer console (F12)
-- Verify input file formats
-- Test with sample data first
-
-## 🔗 Links
-
-- **Health Status**: http://localhost:3000/health
-- **Landing Page**: http://localhost:3000/
-- **Rakuten Report Builder**: http://localhost:3000/rakuten-report
-- **Report Filtering Tool**: http://localhost:3000/report-filtering
-- **Numbers Manager**: http://localhost:3000/number-manager
-- **Management Suite**: http://localhost:3000/management-suite
-
 ---
 
-**Made with ❤️ by Romain EDIN | Version 1.0.0**
+**Need Help?** Check the Troubleshooting section or review the activity logs in the Number Manager for detailed error messages.
+
+**Ready to Start?** Run `npm start` and visit `http://localhost:3000`
+
+**Made with ❤️ by Romain EDIN | Version 1.1.0**
