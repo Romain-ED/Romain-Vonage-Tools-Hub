@@ -57,7 +57,7 @@ app.get('/health', (req, res) => {
         status: 'healthy',
         timestamp: new Date().toISOString(),
         service: 'Romain Vonage Tools Hub',
-        version: '1.0.0',
+        version: '1.0.1',
         tools: {
             'rakuten-report': 'Rakuten Security Report Builder',
             'report-filtering': 'Vonage Reports API Filter Tool',
