@@ -16,34 +16,10 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from public directory
-app.use(express.static('public'));
-
-// Route for the landing page
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Routes for individual tools
-app.get('/rakuten-report', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'rakuten-report', 'index.html'));
-});
-
-app.get('/report-filtering', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'report-filtering', 'index.html'));
-});
-
-app.get('/number-manager', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'number-manager', 'index.html'));
-});
-
-app.get('/management-suite', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'management-suite', 'index.html'));
-});
-
-// Changelog page
-app.get('/changelog', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'changelog.html'));
-});
+app.use(express.static('public', {
+    extensions: ['html'],
+    index: 'index.html'
+}));
 
 // Health check endpoint for VCR (required endpoint: /_/health)
 app.get('/_/health', (req, res) => {
