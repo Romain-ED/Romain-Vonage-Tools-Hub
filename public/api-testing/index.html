@@ -221,11 +221,15 @@
                 <p class="text-sm" x-text="apiKey && apiSecret ? 'Credentials configured - Ready to test APIs' : 'Enter credentials to begin testing'"></p>
             </div>
 
-            <div class="mt-4 p-3 bg-yellow-900/30 border border-yellow-700 rounded-lg">
-                <p class="text-sm text-yellow-200">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                    Session-based mode: Credentials are not permanently stored on the server
-                </p>
+            <!-- Account Balance Display -->
+            <div class="mt-4 p-3 bg-blue-900/30 border border-blue-700 rounded-lg" x-show="accountBalance !== null">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-wallet mr-2 text-blue-400"></i>
+                        <span class="text-sm text-blue-200">Account Balance:</span>
+                    </div>
+                    <span class="text-lg font-bold text-blue-300" x-text="accountBalance ? '€' + accountBalance : 'Loading...'"></span>
+                </div>
             </div>
         </div>
 

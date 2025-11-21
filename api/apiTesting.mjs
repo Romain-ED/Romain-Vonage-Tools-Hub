@@ -112,6 +112,32 @@ export function setupApiTestingRoutes(app) {
         }
     });
 
+    // Get account balance
+    app.get(`${prefix}/account/balance`, async (req, res) => {
+        try {
+            const { session_id = 'default' } = req.query;
+            const session = sessions.get(session_id);
+
+            if (!session) {
+                return res.status(401).json({ error: 'Not connected. Please connect first.' });
+            }
+
+            const balance = await session.vonage.accounts.getBalance();
+
+            res.json({
+                success: true,
+                balance: parseFloat(balance.value).toFixed(2),
+                autoReload: balance.autoReload
+            });
+        } catch (error) {
+            console.error('Balance error:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message
+            });
+        }
+    });
+
     // Send SMS
     app.post(`${prefix}/sms/send`, async (req, res) => {
         try {

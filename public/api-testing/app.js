@@ -8,6 +8,7 @@ function apiTestingTool() {
         // Credentials
         apiKey: '',
         apiSecret: '',
+        accountBalance: null,
 
         // UI State
         currentTab: 'messages',
@@ -194,11 +195,71 @@ function apiTestingTool() {
                     this.apiKey = data.credentials.api_key || '';
                     this.apiSecret = data.credentials.api_secret || '';
                     this.addLog('success', 'Saved credentials loaded successfully');
+                    // Fetch balance after loading credentials
+                    await this.getBalance();
                 } else {
                     this.addLog('info', 'No saved credentials found');
                 }
             } catch (error) {
                 this.addLog('error', `Failed to load credentials: ${error.message}`);
+            }
+        },
+
+        /**
+         * Get account balance
+         */
+        async getBalance() {
+            try {
+                const response = await fetch('/api-testing/api/account/balance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        api_key: this.apiKey,
+                        api_secret: this.apiSecret
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    this.accountBalance = data.balance;
+                    this.addLog('info', `Account balance: ${data.balance} EUR`);
+                } else {
+                    this.addLog('error', `Failed to fetch balance: ${data.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                this.addLog('error', `Failed to fetch balance: ${error.message}`);
+            }
+        },
+
+        /**
+         * Refresh account balance
+         */
+        async refreshBalance() {
+            try {
+                const response = await fetch('/api-testing/api/account/balance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        api_key: this.apiKey,
+                        api_secret: this.apiSecret
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    this.accountBalance = data.balance;
+                    this.addLog('info', `Balance refreshed: ${data.balance} EUR`);
+                } else {
+                    this.addLog('error', `Failed to refresh balance: ${data.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                this.addLog('error', `Failed to refresh balance: ${error.message}`);
             }
         },
 
@@ -271,6 +332,8 @@ function apiTestingTool() {
 
                 if (success) {
                     this.addLog('success', `SMS sent successfully to ${this.sms.to}`);
+                    // Refresh balance after successful send
+                    await this.refreshBalance();
                 } else {
                     this.addLog('error', `Failed to send SMS: ${data.message || 'Unknown error'}`);
                 }
@@ -334,6 +397,8 @@ function apiTestingTool() {
 
                 if (success) {
                     this.addLog('success', `WhatsApp message sent successfully to ${this.whatsapp.to}`);
+                    // Refresh balance after successful send
+                    await this.refreshBalance();
                 } else {
                     this.addLog('error', `Failed to send WhatsApp: ${data.message || 'Unknown error'}`);
                 }
@@ -405,6 +470,9 @@ function apiTestingTool() {
                     if (data.request_id) {
                         this.verify.check.requestId = data.request_id;
                     }
+
+                    // Refresh balance after successful start
+                    await this.refreshBalance();
                 } else {
                     this.addLog('error', `Failed to start verification: ${data.message || 'Unknown error'}`);
                 }
@@ -596,6 +664,8 @@ function apiTestingTool() {
 
                 if (success) {
                     this.addLog('success', `TTS call initiated successfully to ${this.voice.to}`);
+                    // Refresh balance after successful call
+                    await this.refreshBalance();
                 } else {
                     this.addLog('error', `Failed to make TTS call: ${data.message || 'Unknown error'}`);
                 }
