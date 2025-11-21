@@ -1,11 +1,11 @@
 # Romain's Vonage Tools Hub
 
-**Version:** v1.3.0
+**Version:** v1.4.0
 **Author:** Romain EDIN
 
 A unified web-based hub for managing multiple Vonage telecommunications tools and utilities.
 
-![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)
 ![License](https://img.shields.io/badge/license-ISC-yellow.svg)
 
@@ -19,39 +19,35 @@ This hub provides a centralized interface for various Vonage management tools, a
 
 ## 🛠️ Available Tools
 
-### 1. Rakuten Security Report Builder (v2.2.0)
+### 1. CSV Analysis Suite (v3.0.0)
 **Status:** ✅ Fully Functional
 
-**Purpose:** Generate comprehensive security reports for Rakuten with call analysis and duration matrices.
+**Purpose:** Unified CSV processing powerhouse combining advanced filtering and Rakuten security analysis. Two specialized tools in one tabbed interface.
 
 **Features:**
-- FC (Foreign Carrier) analysis
-- Call duration matrices (Originate × Terminate)
-- Interactive charts with Chart.js
-- Spreadsheet paste functionality
-- CSV export capabilities
+- **Report Filtering Tab:**
+  - Advanced CSV filtering with regex support
+  - Multiple export formats (CSV, JSON, Excel)
+  - Column analysis and statistics
+  - Internal fields removal
+  - Real-time preview
+- **Rakuten Analysis Tab:**
+  - FC (Foreign Carrier) analysis
+  - Call duration matrices (Originate × Terminate)
+  - Interactive charts with Chart.js
+  - Spreadsheet paste functionality
+  - CSV export capabilities
+- Tabbed interface with deep linking (#filtering, #rakuten)
+- Consistent dark theme with Tailwind CSS
+- Unified Alpine.js state management
 
-**Access:** `/rakuten-report`
+**Access:** `/csv-suite`
+
+**Legacy URLs:** `/rakuten-report` and `/report-filtering` redirect to respective tabs
 
 ---
 
-### 2. Vonage Reports API Filter Tool (v2.0.0)
-**Status:** ✅ Fully Functional
-
-**Purpose:** Advanced filtering and processing of Vonage Reports API CSV data.
-
-**Features:**
-- Advanced CSV filtering with regex support
-- Multiple export formats (CSV, JSON, Excel)
-- Column analysis and statistics
-- Internal fields removal
-- Real-time preview
-
-**Access:** `/report-filtering`
-
----
-
-### 3. Vonage Management Suite (v1.3.0)
+### 2. Vonage Management Suite (v1.3.0)
 **Status:** ✅ Fully Functional
 
 **Purpose:** Unified interface for managing Vonage phone numbers and subaccounts.
@@ -139,8 +135,13 @@ Romain-Vonage-Tools-Hub/
 └── public/                   # Static frontend files
     ├── index.html           # Landing page
     ├── changelog.html       # Version history
-    ├── rakuten-report/      # Rakuten tool
-    ├── report-filtering/    # Filtering tool
+    ├── csv-suite/           # CSV Analysis Suite (unified)
+    │   ├── index.html       # Tabbed interface (Filtering + Rakuten)
+    │   ├── scripts/         # JavaScript modules
+    │   │   └── filter-tool.js
+    │   └── assets/          # Example files
+    ├── rakuten-report/      # Legacy redirect → /csv-suite#rakuten
+    ├── report-filtering/    # Legacy redirect → /csv-suite#filtering
     └── management-suite/    # Management Suite
         ├── index.html       # Frontend UI
         └── app.js           # Alpine.js component
@@ -331,10 +332,14 @@ npm start
 
 **Current Status:** 100% Complete - All Tools Operational! 🎉
 
-### Completed (v1.3.0)
+### Completed (v1.4.0)
 - ✅ Hub infrastructure and landing page
-- ✅ Rakuten Security Report Builder (v2.2.0)
-- ✅ Vonage Reports API Filter Tool (v2.0.0)
+- ✅ **CSV Analysis Suite (v3.0.0)** - Unified CSV Processing
+  - ✅ Consolidated Rakuten Report Builder + Report Filtering Tool
+  - ✅ Tabbed interface with deep linking (#filtering, #rakuten)
+  - ✅ Migrated to unified Tailwind CSS theme
+  - ✅ Alpine.js state management
+  - ✅ Legacy URL redirects for backward compatibility
 - ✅ **Vonage Management Suite (v1.3.0)** - Complete Numbers & Subaccounts Management
   - ✅ All API endpoints (Numbers + Subaccounts)
   - ✅ Tabbed interface (Numbers + Subaccounts)
@@ -363,7 +368,28 @@ npm start
 
 ## 📝 Changelog
 
-### v1.3.0 (2025-11-20)
+### v1.4.0 (2025-11-21)
+**Major Update: CSV Tools Consolidation**
+- 🎉 **NEW:** CSV Analysis Suite v3.0.0 - Unified CSV processing powerhouse
+- ✨ Consolidated Rakuten Security Report Builder + Report Filtering Tool
+- ✨ Tabbed interface with deep linking (#filtering, #rakuten)
+- ✨ Migrated Report Filtering UI from custom CSS to Tailwind CSS
+- ✨ Unified Alpine.js state management for both tools
+- ✨ Created redirect pages for old URLs (/rakuten-report → /csv-suite#rakuten)
+- ✨ Created redirect pages for old URLs (/report-filtering → /csv-suite#filtering)
+- ✅ Hub now features 2 streamlined tools (down from 3)
+- 📝 Updated all documentation to reflect consolidated structure
+
+### v1.3.0 (2025-11-21)
+**Major Update: Removed Redundant Number Manager**
+- 🗑️ **REMOVED:** Standalone Vonage Numbers Manager (redundant)
+- 📝 All number management features now available in Management Suite
+- 📝 Management Suite provides identical functionality plus subaccount management
+- 🧹 Cleaned up codebase - removed duplicate API endpoints and frontend files
+- 📝 Updated all documentation to reflect unified tool structure
+- ✅ Hub now features 3 streamlined tools (down from 4)
+
+### v1.2.0 (2025-11-20)
 **Major Update: Management Suite Complete + Critical SDK Fixes**
 - 🎉 **NEW:** Vonage Management Suite (v1.3.0) - Unified Numbers & Subaccounts Management
 - ✨ Complete backend API for subaccounts (create, list, balance, transfer)
@@ -471,4 +497,4 @@ Copyright (c) 2025 Romain EDIN
 
 **Ready to Start?** Run `npm start` and visit `http://localhost:3000`
 
-**Made with ❤️ by Romain EDIN | Version 1.2.0**
+**Made with ❤️ by Romain EDIN | Version 1.4.0**

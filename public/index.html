@@ -81,7 +81,7 @@
                         <i class="fas fa-heartbeat mr-2"></i>Health
                     </a>
                     <span class="px-3 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded-full text-sm">
-                        v1.3.0
+                        v1.4.0
                     </span>
                 </div>
             </div>
@@ -106,66 +106,38 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Tools Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <!-- Rakuten Report Builder -->
+            <!-- CSV Analysis Suite -->
             <div class="tool-card rounded-xl p-8 border border-gray-700 fade-in" style="animation-delay: 0.1s">
                 <div class="flex items-start mb-6">
                     <div class="tool-icon text-5xl text-blue-400 mr-6">
-                        <i class="fas fa-shield-alt"></i>
+                        <i class="fas fa-table"></i>
                     </div>
                     <div class="flex-1">
-                        <h3 class="text-2xl font-bold mb-2">Rakuten Security Report Builder</h3>
-                        <span class="px-2 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded text-xs">v2.2.0</span>
+                        <h3 class="text-2xl font-bold mb-2">CSV Analysis Suite</h3>
+                        <span class="px-2 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded text-xs">v3.0.0</span>
+                        <span class="px-2 py-1 bg-purple-500 bg-opacity-20 text-purple-400 rounded text-xs ml-2">UNIFIED</span>
                     </div>
                 </div>
                 <p class="text-gray-400 mb-6">
-                    Process and analyze call data reports from Rakuten services. Transform raw telecommunications
-                    data into structured analytics with FC (Feature Code) analysis, interactive charts, and duration matrices.
+                    Unified CSV processing powerhouse combining advanced filtering and Rakuten security analysis.
+                    Two specialized tools in one tabbed interface for all your telecommunications data needs.
                 </p>
                 <div class="mb-6">
                     <h4 class="text-sm font-semibold text-gray-300 mb-2">Key Features:</h4>
                     <ul class="text-sm text-gray-400 space-y-1">
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Drag & drop CSV upload</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Real-time progress tracking</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Interactive visualizations</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Call duration matrix analysis</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i><strong>Report Filtering:</strong> Regex support, multi-format export</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i><strong>Rakuten Analysis:</strong> FC analysis, duration matrices</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Interactive Chart.js visualizations</li>
+                        <li><i class="fas fa-check text-green-400 mr-2"></i>Tabbed interface with deep linking</li>
                     </ul>
                 </div>
-                <a href="/rakuten-report" class="inline-block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all hover:shadow-lg">
-                    <i class="fas fa-arrow-right mr-2"></i>Launch Tool
-                </a>
-            </div>
-
-            <!-- Report Filtering Tool -->
-            <div class="tool-card rounded-xl p-8 border border-gray-700 fade-in" style="animation-delay: 0.2s">
-                <div class="flex items-start mb-6">
-                    <div class="tool-icon text-5xl text-green-400 mr-6">
-                        <i class="fas fa-filter"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-2xl font-bold mb-2">Vonage Reports API Filter Tool</h3>
-                        <span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-xs">v2.0.0</span>
-                    </div>
-                </div>
-                <p class="text-gray-400 mb-6">
-                    Powerful web-based CSV filtering and analysis tool for Vonage API reports. Process large files
-                    with advanced filtering, data analysis, and multiple export formats.
-                </p>
-                <div class="mb-6">
-                    <h4 class="text-sm font-semibold text-gray-300 mb-2">Key Features:</h4>
-                    <ul class="text-sm text-gray-400 space-y-1">
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Advanced filtering with regex support</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Column analysis & visualization</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Multiple export formats (CSV, JSON, Excel)</li>
-                        <li><i class="fas fa-check text-green-400 mr-2"></i>Internal fields removal</li>
-                    </ul>
-                </div>
-                <a href="/report-filtering" class="inline-block w-full text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all hover:shadow-lg">
+                <a href="/csv-suite" class="inline-block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all hover:shadow-lg">
                     <i class="fas fa-arrow-right mr-2"></i>Launch Tool
                 </a>
             </div>
 
             <!-- Management Suite -->
-            <div class="tool-card rounded-xl p-8 border border-gray-700 fade-in" style="animation-delay: 0.3s">
+            <div class="tool-card rounded-xl p-8 border border-gray-700 fade-in" style="animation-delay: 0.2s">
                 <div class="flex items-start mb-6">
                     <div class="tool-icon text-5xl text-yellow-400 mr-6">
                         <i class="fas fa-cogs"></i>
@@ -200,7 +172,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="text-center text-gray-400">
                 <p class="mb-2">
-                    <span class="font-semibold text-white">Romain's Vonage Tools Hub</span> v1.3.0
+                    <span class="font-semibold text-white">Romain's Vonage Tools Hub</span> v1.4.0
                 </p>
                 <p class="text-sm">
                     Developed by <span class="text-blue-400">Romain EDIN</span> |

@@ -94,10 +94,9 @@ app.get('/health', (req, res) => {
         status: 'healthy',
         timestamp: new Date().toISOString(),
         service: 'Romain Vonage Tools Hub',
-        version: '1.3.0',
+        version: '1.4.0',
         tools: {
-            'rakuten-report': 'Rakuten Security Report Builder',
-            'report-filtering': 'Vonage Reports API Filter Tool',
+            'csv-suite': 'CSV Analysis Suite (Rakuten + Filtering)',
             'management-suite': 'Vonage Management Suite'
         }
     });
@@ -112,9 +111,9 @@ server.listen(PORT, HOST, () => {
     console.log(`🏥 Health check available at: http://${HOST}:${PORT}/_/health`);
     console.log(`\n📌 Available Tools:`);
     console.log(`   - Landing Page: http://${HOST}:${PORT}/`);
-    console.log(`   - Rakuten Report Builder: http://${HOST}:${PORT}/rakuten-report`);
-    console.log(`   - Report Filtering Tool: http://${HOST}:${PORT}/report-filtering`);
+    console.log(`   - CSV Analysis Suite: http://${HOST}:${PORT}/csv-suite`);
     console.log(`   - Management Suite: http://${HOST}:${PORT}/management-suite`);
+    console.log(`   - Legacy redirects: /rakuten-report, /report-filtering`);
 
     // Test the health endpoint internally
     setTimeout(() => {
