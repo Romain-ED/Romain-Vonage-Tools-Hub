@@ -129,6 +129,7 @@
 
                 // Rakuten data
                 rakuten: {
+                    currentPage: 'upload',
                     savedMapping: null,
                     usingSavedMapping: false,
                     rawDataFile: null,
@@ -175,6 +176,10 @@
                 switchTab(tab) {
                     this.activeTab = tab;
                     window.location.hash = tab;
+                },
+
+                switchRakutenPage(page) {
+                    this.rakuten.currentPage = page;
                 },
 
                 // Rakuten file handling
@@ -729,6 +734,40 @@
                     this.addRakutenLog('Cleared saved mapping selection');
                 },
 
+                deleteSavedMapping() {
+                    if (!confirm('Are you sure you want to delete the saved mapping? This action cannot be undone.')) {
+                        return;
+                    }
+
+                    localStorage.removeItem('didFcMapping');
+                    this.rakuten.savedMapping = null;
+                    this.rakuten.usingSavedMapping = false;
+                    this.rakuten.didFcData = null;
+                    this.rakuten.didFcPreview = [];
+
+                    this.addRakutenLog('Saved mapping deleted', 'info');
+                },
+
+                downloadMapping() {
+                    if (!this.rakuten.savedMapping) return;
+
+                    const csv = Papa.unparse(this.rakuten.savedMapping.data);
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+
+                    if (link.download !== undefined) {
+                        const url = URL.createObjectURL(blob);
+                        link.setAttribute('href', url);
+                        link.setAttribute('download', `did_fc_mapping_${new Date().toISOString().slice(0, 10)}.csv`);
+                        link.style.visibility = 'hidden';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+
+                    this.addRakutenLog('Mapping downloaded as CSV');
+                },
+
                 formatFileSize(bytes) {
                     if (bytes === 0) return '0 Bytes';
                     const k = 1024;
@@ -944,8 +983,28 @@
 
         <!-- Rakuten Tab -->
         <div :class="activeTab === 'rakuten' ? '' : 'hidden'">
-            <!-- Rakuten Upload Section -->
-            <div class="space-y-6">
+            <!-- Sub-navigation for Rakuten pages -->
+            <div class="mb-6 flex items-center space-x-4 bg-gray-800 rounded-lg border border-gray-700 p-4">
+                <button @click="switchRakutenPage('upload')"
+                       :class="rakuten.currentPage === 'upload' ? 'text-blue-400 bg-blue-900' : 'text-gray-300 hover:text-blue-400'"
+                       class="px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                    <i class="fas fa-upload mr-2"></i>Upload
+                </button>
+                <button @click="switchRakutenPage('mappings')"
+                       :class="rakuten.currentPage === 'mappings' ? 'text-blue-400 bg-blue-900' : 'text-gray-300 hover:text-blue-400'"
+                       class="px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                    <i class="fas fa-database mr-2"></i>DID/FC Mapping
+                    <span x-show="rakuten.savedMapping" class="ml-1 bg-green-500 text-white text-xs px-1 py-0.5 rounded-full">1</span>
+                </button>
+                <button @click="switchRakutenPage('docs')"
+                       :class="rakuten.currentPage === 'docs' ? 'text-blue-400 bg-blue-900' : 'text-gray-300 hover:text-blue-400'"
+                       class="px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                    <i class="fas fa-book mr-2"></i>Documentation
+                </button>
+            </div>
+
+            <!-- Upload Page -->
+            <div x-show="rakuten.currentPage === 'upload'" class="space-y-6">
                 <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
                     <h2 class="text-2xl font-bold text-white mb-6">
                         <i class="fas fa-cloud-upload-alt mr-2 text-blue-400"></i>Upload Files
@@ -1251,6 +1310,225 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Mappings Page -->
+            <div x-show="rakuten.currentPage === 'mappings'" class="space-y-8">
+                <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
+                    <h2 class="text-2xl font-bold text-white mb-6">
+                        <i class="fas fa-database mr-2 text-blue-400"></i>DID/FC Mapping Management
+                    </h2>
+
+                    <!-- Information Box -->
+                    <div class="bg-blue-900/30 border-l-4 border-blue-400 p-4 rounded-r-lg mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-blue-300 font-medium mb-1">How Mapping Storage Works</h3>
+                                <p class="text-blue-200 text-sm">
+                                    Your DID/FC mappings are saved securely in your browser's local storage. This means:
+                                </p>
+                                <ul class="text-blue-200 text-sm mt-2 space-y-1">
+                                    <li>• <strong>Privacy-focused:</strong> Data never leaves your computer or browser</li>
+                                    <li>• <strong>Persistent:</strong> Mappings remain saved even after closing the browser</li>
+                                    <li>• <strong>Browser-specific:</strong> Each browser stores its own copy of your mappings</li>
+                                    <li>• <strong>One mapping limit:</strong> Only one DID/FC mapping can be stored at a time</li>
+                                    <li>• <strong>Backup recommended:</strong> Use "Download as CSV" to backup your mappings</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Mapping Status -->
+                    <div x-show="!rakuten.savedMapping" class="bg-gray-700 rounded-lg p-6 text-center">
+                        <i class="fas fa-folder-open text-4xl text-gray-400 mb-4"></i>
+                        <h3 class="text-lg font-medium text-white mb-2">No Saved Mapping</h3>
+                        <p class="text-gray-300 mb-4">Create your first DID/FC mapping by uploading a file on the Upload page.</p>
+                        <div class="flex justify-center space-x-3">
+                            <button @click="switchRakutenPage('upload')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition-colors">
+                                <i class="fas fa-upload mr-2"></i>Go to Upload
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Saved Mapping Display -->
+                    <div x-show="rakuten.savedMapping" class="space-y-6">
+                        <div class="bg-green-900/20 border border-green-700 rounded-lg p-6">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-medium text-white mb-2">
+                                        <i class="fas fa-check-circle text-green-400 mr-2"></i>Saved Mapping
+                                    </h3>
+                                    <div class="text-sm text-gray-300 space-y-1">
+                                        <div>
+                                            <span class="font-medium">Saved:</span>
+                                            <span x-text="rakuten.savedMapping?.savedAt"></span>
+                                        </div>
+                                        <div>
+                                            <span class="font-medium">Entries:</span>
+                                            <span x-text="rakuten.savedMapping?.data?.length || 0"></span> DID/FC pairs
+                                        </div>
+                                        <div>
+                                            <span class="font-medium">File Size:</span>
+                                            <span x-text="rakuten.savedMapping?.fileSize"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button @click="deleteSavedMapping()"
+                                       class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded transition-colors">
+                                    <i class="fas fa-trash mr-2"></i>Delete Mapping
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Full Mapping Data -->
+                        <div class="bg-gray-700 rounded-lg p-6">
+                            <h4 class="text-md font-medium text-white mb-4">
+                                <i class="fas fa-table mr-2"></i>Complete Mapping Data
+                            </h4>
+                            <div class="bg-gray-900 rounded border border-gray-600 overflow-hidden max-h-96 overflow-y-auto">
+                                <table class="w-full text-sm">
+                                    <thead class="bg-gray-800 sticky top-0">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase">#</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase">DID</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase">FC (Free Call)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-600">
+                                        <template x-for="(row, index) in (rakuten.savedMapping?.data || [])" :key="index">
+                                            <tr class="hover:bg-gray-800">
+                                                <td class="px-4 py-2 text-xs text-gray-400" x-text="index + 1"></td>
+                                                <td class="px-4 py-2 text-gray-300 font-mono" x-text="row.DID || row.did"></td>
+                                                <td class="px-4 py-2 text-gray-300 font-mono" x-text="row.FC || row.fc"></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-2 text-xs text-gray-400 text-center">
+                                Showing all <span x-text="(rakuten.savedMapping?.data?.length || 0)"></span> DID/FC mappings
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex justify-between">
+                            <button @click="downloadMapping()"
+                                   class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition-colors">
+                                <i class="fas fa-download mr-2"></i>Download as CSV
+                            </button>
+                            <button @click="switchRakutenPage('upload')"
+                                   class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded transition-colors">
+                                <i class="fas fa-upload mr-2"></i>Upload New
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documentation Page -->
+            <div x-show="rakuten.currentPage === 'docs'" class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-8">
+                <div class="mb-8 border-b border-gray-700 pb-6">
+                    <h1 class="text-3xl font-bold text-white mb-4">
+                        <i class="fas fa-book mr-3 text-blue-400"></i>Documentation
+                    </h1>
+                    <div class="bg-blue-900/30 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-blue-300">
+                                    <strong>Version 3.0.0</strong> - CSV Suite Integration by Romain EDIN
+                                </p>
+                                <p class="text-blue-200 text-sm mt-1">
+                                    This tool is provided as-is with no warranty. The developer cannot be held responsible for any issues arising from its use.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Start Guide -->
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Quick Start</h2>
+                    <div class="prose text-gray-300 max-w-none">
+                        <ol class="list-decimal list-inside space-y-2">
+                            <li>Upload your <strong class="text-white">Raw Data CSV</strong> using drag & drop or click to browse</li>
+                            <li>Upload your <strong class="text-white">DID/FC Reference CSV</strong> - see instant preview and validation</li>
+                            <li>Watch the <strong class="text-white">real-time progress bar</strong> during processing</li>
+                            <li>View <strong class="text-white">interactive charts</strong> and analytics</li>
+                            <li>Download the processed CSV file directly</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <!-- Output Fields -->
+                <section>
+                    <h2 class="text-2xl font-semibold text-white mb-4">Output Fields</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full border border-gray-700 rounded-lg">
+                            <thead class="bg-gray-700">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-white border-b border-gray-600">Field</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-white border-b border-gray-600">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-700">
+                                <tr class="bg-blue-900/30">
+                                    <td colspan="2" class="px-4 py-2 text-sm font-semibold text-blue-300">Original Fields</td>
+                                </tr>
+                                <tr class="bg-gray-800">
+                                    <td class="px-4 py-3 text-sm font-medium text-white">account_id, direction, from, to, date_start, date_end, duration</td>
+                                    <td class="px-4 py-3 text-sm text-gray-300">Copied from raw data</td>
+                                </tr>
+                                <tr class="bg-green-900/30">
+                                    <td colspan="2" class="px-4 py-2 text-sm font-semibold text-green-300">Generated Fields</td>
+                                </tr>
+                                <tr class="bg-gray-800">
+                                    <td class="px-4 py-3 text-sm font-medium text-white">Originate</td>
+                                    <td class="px-4 py-3 text-sm text-gray-300">
+                                        <div class="space-y-1">
+                                            <div><strong>Classification based on 'from' field:</strong></div>
+                                            <div>• <code class="bg-gray-700 px-1 rounded">Anonymous</code>: Contains "Coinline", "Payphone", or starts with "ano"</div>
+                                            <div>• <code class="bg-gray-700 px-1 rounded">Toll Free</code>: Starts with "81800"</div>
+                                            <div>• <code class="bg-gray-700 px-1 rounded">Mobile</code>: Starts with "8170", "8180", or "8190"</div>
+                                            <div>• <code class="bg-gray-700 px-1 rounded">Fixed</code>: Starts with "81" (but not toll free or mobile)</div>
+                                            <div>• <code class="bg-gray-700 px-1 rounded">Int'l</code>: All other numbers (default)</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="bg-gray-800">
+                                    <td class="px-4 py-3 text-sm font-medium text-white">Terminate</td>
+                                    <td class="px-4 py-3 text-sm text-gray-300">
+                                        <div class="space-y-1">
+                                            <div><strong>Classification based on 'to' field and DID/FC mapping:</strong></div>
+                                            <div>• <code class="bg-gray-700 px-1 rounded">TFN Bundle</code>: The 'to' number exists in DID/FC reference file</div>
+                                            <div>• <code class="bg-gray-700 px-1 rounded">Landline</code>: The 'to' number is not found in DID/FC mapping (default)</div>
+                                            <div class="text-xs text-gray-400 mt-1">Note: TFN Bundle indicates the call terminated to a Toll-Free Number with an assigned Free Call code</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="bg-gray-800">
+                                    <td class="px-4 py-3 text-sm font-medium text-white">FC, FC2, FC3</td>
+                                    <td class="px-4 py-3 text-sm text-gray-300">
+                                        <div class="space-y-1">
+                                            <div><strong>Free Call code assignment from DID/FC mapping:</strong></div>
+                                            <div>• Looks up 'to' field in DID/FC reference file to find associated Free Call codes</div>
+                                            <div>• If multiple FCs exist for same DID, they are distributed across FC, FC2, FC3 columns</div>
+                                            <div>• <strong>Prioritization:</strong> FCs starting with "0120" are always placed in FC column first</div>
+                                            <div>• Non-0120 FCs fill remaining columns (FC2, FC3) or go to FC if no 0120 codes exist</div>
+                                            <div>• Shows <code class="bg-gray-700 px-1 rounded">NA</code> if no mapping found for the DID</div>
+                                            <div class="text-xs text-gray-400 mt-1">Example: DID has FCs "0120-123456", "0570-789012", "0120-654321" → FC="0120-123456", FC2="0120-654321", FC3="0570-789012"</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
             </div>
         </div>
     </div>
