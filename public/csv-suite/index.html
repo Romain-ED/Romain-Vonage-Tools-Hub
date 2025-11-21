@@ -945,13 +945,18 @@
                             <!-- Results file info will be populated here -->
                         </div>
                     </div>
-                    <div class="overflow-x-auto bg-gray-700 rounded-lg">
-                        <table id="resultsTable" class="min-w-full divide-y divide-gray-600">
-                            <thead id="tableHead" class="bg-gray-800"></thead>
-                            <tbody id="tableBody" class="divide-y divide-gray-700"></tbody>
-                        </table>
+                    <div class="relative">
+                        <div class="overflow-x-auto overflow-y-auto bg-gray-700 rounded-lg border border-gray-600 max-h-[600px] shadow-inner">
+                            <table id="resultsTable" class="min-w-full divide-y divide-gray-600">
+                                <thead id="tableHead" class="bg-gray-800 sticky top-0 z-20 shadow-md"></thead>
+                                <tbody id="tableBody" class="divide-y divide-gray-700 bg-gray-700"></tbody>
+                            </table>
+                        </div>
+                        <div class="mt-2 text-xs text-gray-400 text-center">
+                            <i class="fas fa-info-circle mr-1"></i>Scroll horizontally to view more columns
+                        </div>
                     </div>
-                    <div id="pagination" class="mt-4 flex justify-center gap-2"></div>
+                    <div id="pagination" class="mt-6"></div>
                 </div>
 
                 <!-- Log Section -->

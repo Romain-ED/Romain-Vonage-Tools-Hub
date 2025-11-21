@@ -4,7 +4,7 @@ class CSVFilterTool {
         this.headers = [];
         this.filteredData = [];
         this.currentPage = 1;
-        this.rowsPerPage = 100;
+        this.rowsPerPage = 20;
         this.filters = [];
         this.analysisData = {};
         this.logVisible = true;
@@ -1235,11 +1235,18 @@ class CSVFilterTool {
 
         tableHead.innerHTML = `
             <tr>
-                <th class="bulk-select-cell"><input type="checkbox" id="selectAllRows" class="bulk-select-checkbox"></th>
-                ${visibleHeaders.map(header => `<th class="sortable" onclick="csvTool.sortColumn('${header}')">${header}</th>`).join('')}
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap sticky left-0 bg-gray-800 z-10 border-r border-gray-600">
+                    <input type="checkbox" id="selectAllRows" class="rounded">
+                </th>
+                ${visibleHeaders.map(header => `
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap cursor-pointer hover:text-blue-400 transition-colors"
+                        onclick="csvTool.sortColumn('${this.escapeHtml(header)}')">
+                        ${this.escapeHtml(header)}
+                    </th>
+                `).join('')}
             </tr>
         `;
-        
+
         // Add select all functionality
         const selectAllCheckbox = document.getElementById('selectAllRows');
         if (selectAllCheckbox) {
@@ -1253,13 +1260,19 @@ class CSVFilterTool {
         tableBody.innerHTML = pageData.map((row, index) => {
             const globalIndex = startIndex + index;
             return `
-                <tr>
-                    <td class="bulk-select-cell"><input type="checkbox" class="bulk-select-checkbox row-checkbox" data-row-index="${globalIndex}"></td>
-                    ${visibleHeaders.map(header => `<td>${this.escapeHtml(row[header] || '')}</td>`).join('')}
+                <tr class="hover:bg-gray-600 transition-colors">
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-300 sticky left-0 bg-gray-700 group-hover:bg-gray-600 z-10 border-r border-gray-600">
+                        <input type="checkbox" class="row-checkbox rounded" data-row-index="${globalIndex}">
+                    </td>
+                    ${visibleHeaders.map(header => `
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-300">
+                            ${this.escapeHtml(row[header] || '')}
+                        </td>
+                    `).join('')}
                 </tr>
             `;
         }).join('');
-        
+
         // Add row selection listeners
         document.querySelectorAll('.row-checkbox').forEach(checkbox => {
             checkbox.addEventListener('change', this.updateBulkActions.bind(this));
@@ -1275,23 +1288,80 @@ class CSVFilterTool {
             return;
         }
 
-        let paginationHtml = '';
-        
+        const startIndex = (this.currentPage - 1) * this.rowsPerPage + 1;
+        const endIndex = Math.min(this.currentPage * this.rowsPerPage, this.filteredData.length);
+
+        let paginationHtml = `
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
+                <div class="text-sm text-gray-400">
+                    Showing <span class="font-medium text-white">${startIndex.toLocaleString()}</span> to
+                    <span class="font-medium text-white">${endIndex.toLocaleString()}</span> of
+                    <span class="font-medium text-white">${this.filteredData.length.toLocaleString()}</span> rows
+                </div>
+                <div class="flex items-center gap-2">
+        `;
+
         if (this.currentPage > 1) {
-            paginationHtml += `<button class="page-btn" onclick="csvTool.goToPage(${this.currentPage - 1})">Previous</button>`;
+            paginationHtml += `
+                <button onclick="csvTool.goToPage(${this.currentPage - 1})"
+                        class="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
         }
 
         const startPage = Math.max(1, this.currentPage - 2);
         const endPage = Math.min(totalPages, this.currentPage + 2);
 
+        if (startPage > 1) {
+            paginationHtml += `
+                <button onclick="csvTool.goToPage(1)"
+                        class="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors">
+                    1
+                </button>
+            `;
+            if (startPage > 2) {
+                paginationHtml += `<span class="text-gray-400 px-2">...</span>`;
+            }
+        }
+
         for (let i = startPage; i <= endPage; i++) {
-            const activeClass = i === this.currentPage ? 'active' : '';
-            paginationHtml += `<button class="page-btn ${activeClass}" onclick="csvTool.goToPage(${i})">${i}</button>`;
+            const activeClass = i === this.currentPage
+                ? 'bg-blue-600 text-white font-bold'
+                : 'bg-gray-700 text-white hover:bg-gray-600';
+            paginationHtml += `
+                <button onclick="csvTool.goToPage(${i})"
+                        class="px-3 py-2 ${activeClass} rounded transition-colors">
+                    ${i}
+                </button>
+            `;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                paginationHtml += `<span class="text-gray-400 px-2">...</span>`;
+            }
+            paginationHtml += `
+                <button onclick="csvTool.goToPage(${totalPages})"
+                        class="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors">
+                    ${totalPages}
+                </button>
+            `;
         }
 
         if (this.currentPage < totalPages) {
-            paginationHtml += `<button class="page-btn" onclick="csvTool.goToPage(${this.currentPage + 1})">Next</button>`;
+            paginationHtml += `
+                <button onclick="csvTool.goToPage(${this.currentPage + 1})"
+                        class="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
         }
+
+        paginationHtml += `
+                </div>
+            </div>
+        `;
 
         pagination.innerHTML = paginationHtml;
     }
