@@ -188,6 +188,15 @@
 
             <div class="flex flex-wrap gap-3 mb-4">
                 <button
+                    @click="createSession()"
+                    :disabled="!apiKey || !apiSecret || connecting || connected"
+                    class="px-6 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <i class="fas fa-plug mr-2"></i>
+                    <span x-text="connecting ? 'Connecting...' : (connected ? 'Connected' : 'Connect Account')"></span>
+                </button>
+
+                <button
                     @click="clearCredentials()"
                     class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
                 >
@@ -214,11 +223,12 @@
             <div
                 class="p-4 rounded-lg"
                 :class="{
-                    'bg-green-900/30 border border-green-700': apiKey && apiSecret,
-                    'bg-yellow-900/30 border border-yellow-700': !apiKey || !apiSecret
+                    'bg-green-900/30 border border-green-700': connected,
+                    'bg-yellow-900/30 border border-yellow-700': apiKey && apiSecret && !connected,
+                    'bg-gray-900/30 border border-gray-700': !apiKey || !apiSecret
                 }"
             >
-                <p class="text-sm" x-text="apiKey && apiSecret ? 'Credentials configured - Ready to test APIs' : 'Enter credentials to begin testing'"></p>
+                <p class="text-sm" x-text="connected ? '✓ Connected to Vonage API - Ready to test' : (apiKey && apiSecret ? 'Click Connect Account to begin testing' : 'Enter credentials to begin testing')"></p>
             </div>
 
             <!-- Account Balance Display -->

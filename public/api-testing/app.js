@@ -8,6 +8,8 @@ function apiTestingTool() {
         // Credentials
         apiKey: '',
         apiSecret: '',
+        connected: false,
+        connecting: false,
         accountBalance: null,
         ownedNumbers: [],
 
@@ -211,6 +213,7 @@ function apiTestingTool() {
          * Create session with credentials
          */
         async createSession() {
+            this.connecting = true;
             try {
                 const response = await fetch('/api-testing/api/connect', {
                     method: 'POST',
@@ -226,15 +229,20 @@ function apiTestingTool() {
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    this.addLog('success', 'Session created successfully');
+                    this.connected = true;
+                    this.addLog('success', 'Connected to Vonage API successfully');
                     // Now fetch balance and numbers
                     await this.getBalance();
                     await this.getOwnedNumbers();
                 } else {
-                    this.addLog('error', `Failed to create session: ${data.error || 'Unknown error'}`);
+                    this.connected = false;
+                    this.addLog('error', `Failed to connect: ${data.error || 'Unknown error'}`);
                 }
             } catch (error) {
-                this.addLog('error', `Failed to create session: ${error.message}`);
+                this.connected = false;
+                this.addLog('error', `Failed to connect: ${error.message}`);
+            } finally {
+                this.connecting = false;
             }
         },
 
