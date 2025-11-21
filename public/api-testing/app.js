@@ -359,7 +359,7 @@ function apiTestingTool() {
             this.sms.request = JSON.stringify(requestData, null, 2);
 
             try {
-                const response = await fetch('/api-testing/api/messages/sms', {
+                const response = await fetch('/api-testing/api/sms/send', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -424,7 +424,7 @@ function apiTestingTool() {
             this.whatsapp.request = JSON.stringify(requestData, null, 2);
 
             try {
-                const response = await fetch('/api-testing/api/messages/whatsapp', {
+                const response = await fetch('/api-testing/api/whatsapp/send', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
