@@ -165,7 +165,7 @@
     <!-- Tab Content Container -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Filtering Tab -->
-        <div x-show="activeTab === 'filtering'" style="display: block;" id="filteringTab">
+        <div :class="activeTab === 'filtering' ? '' : 'hidden'" id="filteringTab">
             <!-- Filtering tool content will be here -->
             <div class="space-y-6">
                 <!-- Upload Section -->
@@ -324,7 +324,7 @@
         </div>
 
         <!-- Rakuten Tab -->
-        <div x-show="activeTab === 'rakuten'" style="display: none;">
+        <div :class="activeTab === 'rakuten' ? '' : 'hidden'" class="hidden">
             <!-- Rakuten Upload Section -->
             <div class="space-y-6">
                 <div class="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
