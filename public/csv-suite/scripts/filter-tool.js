@@ -916,6 +916,50 @@ class CSVFilterTool {
         });
     }
 
+    addFilterFromAnalysis(column, value) {
+        try {
+            // Show filter section if hidden
+            const filterSection = document.getElementById('filterSection');
+            if (filterSection.style.display === 'none') {
+                this.showFilterSection();
+            }
+
+            // Add a new filter
+            this.addFilter();
+
+            // Get the last added filter row
+            const lastFilter = document.querySelector('.filter-row:last-child');
+            if (lastFilter) {
+                // Set the column
+                const columnSelect = lastFilter.querySelector('.filter-column');
+                if (columnSelect) {
+                    columnSelect.value = column;
+                }
+
+                // Set the operator to 'equals'
+                const operatorSelect = lastFilter.querySelector('.filter-operator');
+                if (operatorSelect) {
+                    operatorSelect.value = 'equals';
+                }
+
+                // Set the value
+                const valueInput = lastFilter.querySelector('.filter-value');
+                if (valueInput) {
+                    valueInput.value = value;
+                }
+
+                // Scroll to filter section
+                filterSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+                // Log success
+                this.log('success', `Added filter: ${column} equals "${value}"`);
+            }
+        } catch (error) {
+            this.log('error', `Error adding filter from analysis: ${error.message}`);
+            console.error('Add filter from analysis error:', error);
+        }
+    }
+
     removeFilter(filterId) {
         const filterElement = document.querySelector(`[data-filter-id="${filterId}"]`);
         if (filterElement) {
@@ -1490,14 +1534,16 @@ class CSVFilterTool {
                             const color = colorPalette[index % colorPalette.length];
 
                             return `
-                                <div class="group">
+                                <div class="group cursor-pointer hover:bg-gray-750 rounded p-2 -m-2 transition-all duration-200"
+                                     onclick="csvTool.addFilterFromAnalysis('${this.escapeHtml(header).replace(/'/g, "\\'")}', '${this.escapeHtml(value).replace(/'/g, "\\'")}')">
                                     <div class="flex items-center justify-between mb-1">
-                                        <span class="text-sm font-medium text-gray-300 truncate flex-1 mr-2" title="${this.escapeHtml(value)}">
+                                        <span class="text-sm font-medium text-gray-300 truncate flex-1 mr-2 group-hover:text-blue-400 transition-colors" title="${this.escapeHtml(value)} - Click to add as filter">
                                             ${this.escapeHtml(value) || '<em class="text-gray-500">Empty</em>'}
                                         </span>
                                         <div class="flex items-center space-x-2">
-                                            <span class="text-sm font-bold text-white bg-gray-700 px-2 py-0.5 rounded">${count}</span>
+                                            <span class="text-sm font-bold text-white bg-gray-700 px-2 py-0.5 rounded group-hover:bg-blue-600 transition-colors">${count}</span>
                                             <span class="text-xs text-gray-400 w-12 text-right">${percentage}%</span>
+                                            <i class="fas fa-plus-circle text-gray-600 group-hover:text-blue-400 transition-colors text-xs opacity-0 group-hover:opacity-100"></i>
                                         </div>
                                     </div>
                                     <div class="w-full bg-gray-700 rounded-full h-3 overflow-hidden shadow-inner">
