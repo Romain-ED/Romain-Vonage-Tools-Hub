@@ -847,43 +847,67 @@ class CSVFilterTool {
     addFilter() {
         const filterId = 'filter-' + Date.now();
         const filterHtml = `
-            <div class="filter-row" data-filter-id="${filterId}">
-                <select class="filter-column">
-                    <option value="">Select Column</option>
-                    ${this.headers.map(header => `<option value="${header}">${header}</option>`).join('')}
-                </select>
-                <select class="filter-operator">
-                    <option value="contains">Contains</option>
-                    <option value="equals">Equals</option>
-                    <option value="starts_with">Starts with</option>
-                    <option value="ends_with">Ends with</option>
-                    <option value="not_contains">Does not contain</option>
-                    <option value="not_equals">Does not equal</option>
-                    <option value="is_empty">Is empty</option>
-                    <option value="is_not_empty">Is not empty</option>
-                    <option value="regex">Regex pattern</option>
-                </select>
-                <div class="filter-value-container">
-                    <input type="text" class="filter-value" placeholder="Enter value...">
-                    <select class="filter-suggestions" style="display: none;">
-                        <option value="">Select from common values</option>
-                    </select>
+            <div class="filter-row bg-gray-700 rounded-lg p-4 border border-gray-600 hover:border-blue-400 transition-all duration-200" data-filter-id="${filterId}">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
+                    <!-- Column Select -->
+                    <div class="md:col-span-3">
+                        <label class="block text-xs text-gray-400 mb-1 font-medium">Column</label>
+                        <select class="filter-column w-full bg-gray-800 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                            <option value="">Select Column</option>
+                            ${this.headers.map(header => `<option value="${this.escapeHtml(header)}">${this.escapeHtml(header)}</option>`).join('')}
+                        </select>
+                    </div>
+
+                    <!-- Operator Select -->
+                    <div class="md:col-span-3">
+                        <label class="block text-xs text-gray-400 mb-1 font-medium">Operator</label>
+                        <select class="filter-operator w-full bg-gray-800 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                            <option value="contains">Contains</option>
+                            <option value="equals">Equals</option>
+                            <option value="starts_with">Starts with</option>
+                            <option value="ends_with">Ends with</option>
+                            <option value="not_contains">Does not contain</option>
+                            <option value="not_equals">Does not equal</option>
+                            <option value="is_empty">Is empty</option>
+                            <option value="is_not_empty">Is not empty</option>
+                            <option value="regex">Regex pattern</option>
+                        </select>
+                    </div>
+
+                    <!-- Value Input -->
+                    <div class="md:col-span-5">
+                        <label class="block text-xs text-gray-400 mb-1 font-medium">Value</label>
+                        <div class="filter-value-container space-y-2">
+                            <input type="text" class="filter-value w-full bg-gray-800 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="Enter value...">
+                            <select class="filter-suggestions w-full bg-gray-800 text-gray-400 border border-gray-600 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all" style="display: none;">
+                                <option value="">💡 Select from common values</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Remove Button -->
+                    <div class="md:col-span-1 flex items-end">
+                        <button class="remove-filter w-full bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-2 rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 flex items-center justify-center"
+                                onclick="csvTool.removeFilter('${filterId}')"
+                                title="Remove this filter">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
                 </div>
-                <button class="btn btn-danger remove-filter" onclick="csvTool.removeFilter('${filterId}')">Remove</button>
             </div>
         `;
-        
+
         document.getElementById('filtersContainer').insertAdjacentHTML('beforeend', filterHtml);
-        
+
         // Add event listener for column selection to show/hide suggestions
         const newFilterRow = document.querySelector(`[data-filter-id="${filterId}"]`);
         const columnSelect = newFilterRow.querySelector('.filter-column');
         const suggestionsSelect = newFilterRow.querySelector('.filter-suggestions');
-        
+
         columnSelect.addEventListener('change', (e) => {
             this.updateFilterSuggestions(e.target.value, suggestionsSelect);
         });
-        
+
         suggestionsSelect.addEventListener('change', (e) => {
             if (e.target.value) {
                 const textInput = newFilterRow.querySelector('.filter-value');
@@ -1363,35 +1387,54 @@ class CSVFilterTool {
         const analysisGrid = document.getElementById('analysisGrid');
         const analysisResults = document.getElementById('analysisResults');
 
-        analysisGrid.innerHTML = headers.map(header => {
+        // Vibrant color palette for better visualization
+        const colorPalette = [
+            { from: '#3b82f6', to: '#60a5fa', text: '#dbeafe' }, // Blue
+            { from: '#8b5cf6', to: '#a78bfa', text: '#ede9fe' }, // Purple
+            { from: '#ec4899', to: '#f472b6', text: '#fce7f3' }, // Pink
+            { from: '#f59e0b', to: '#fbbf24', text: '#fef3c7' }, // Amber
+            { from: '#10b981', to: '#34d399', text: '#d1fae5' }, // Green
+            { from: '#06b6d4', to: '#22d3ee', text: '#cffafe' }, // Cyan
+            { from: '#ef4444', to: '#f87171', text: '#fee2e2' }, // Red
+            { from: '#6366f1', to: '#818cf8', text: '#e0e7ff' }  // Indigo
+        ];
+
+        analysisGrid.innerHTML = headers.map((header, headerIndex) => {
             const values = this.analysisData[header];
             const totalCount = this.csvData.length;
-            
+
             // Find the maximum count for scaling the bars
             const maxCount = Math.max(...values.map(([, count]) => count));
-            
+
             return `
-                <div class="analysis-card">
-                    <h4 class="analysis-header">${header}</h4>
-                    <div class="analysis-values">
+                <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg hover:border-blue-500 transition-all duration-300">
+                    <h4 class="text-lg font-bold text-white mb-4 pb-2 border-b border-gray-700 flex items-center">
+                        <i class="fas fa-chart-bar mr-2 text-blue-400"></i>
+                        ${this.escapeHtml(header)}
+                        <span class="ml-auto text-sm text-gray-400 font-normal">${values.length} unique values</span>
+                    </h4>
+                    <div class="space-y-3">
                         ${values.map(([value, count], index) => {
                             const percentage = ((count / totalCount) * 100).toFixed(1);
-                            const barWidth = (count / maxCount) * 100; // Percentage of the maximum
-                            const hue = (index * 360 / values.length) % 360; // Different color for each bar
-                            const barColor = `hsl(${hue}, 70%, 60%)`;
-                            const barBgColor = `hsl(${hue}, 70%, 90%)`;
-                            
+                            const barWidth = (count / maxCount) * 100;
+                            const color = colorPalette[index % colorPalette.length];
+
                             return `
-                                <div class="value-item">
-                                    <div class="value-content">
-                                        <span class="value-text" title="${this.escapeHtml(value)}">${this.escapeHtml(value)}</span>
-                                        <span class="value-stats">
-                                            <span class="value-count">${count}</span>
-                                            <span class="value-percentage">(${percentage}%)</span>
+                                <div class="group">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-sm font-medium text-gray-300 truncate flex-1 mr-2" title="${this.escapeHtml(value)}">
+                                            ${this.escapeHtml(value) || '<em class="text-gray-500">Empty</em>'}
                                         </span>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-sm font-bold text-white bg-gray-700 px-2 py-0.5 rounded">${count}</span>
+                                            <span class="text-xs text-gray-400 w-12 text-right">${percentage}%</span>
+                                        </div>
                                     </div>
-                                    <div class="value-bar-container">
-                                        <div class="value-bar" style="width: ${barWidth}%; background-color: ${barColor}; background: linear-gradient(90deg, ${barColor} 0%, ${barBgColor} 100%);"></div>
+                                    <div class="w-full bg-gray-700 rounded-full h-3 overflow-hidden shadow-inner">
+                                        <div class="h-full rounded-full transition-all duration-500 ease-out group-hover:shadow-lg relative"
+                                             style="width: ${barWidth}%; background: linear-gradient(90deg, ${color.from} 0%, ${color.to} 100%);">
+                                            <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
+                                        </div>
                                     </div>
                                 </div>
                             `;
@@ -2416,18 +2459,19 @@ class CSVFilterTool {
         // Sort by confidence
         this.autoSuggestPatterns.sort((a, b) => parseFloat(b.confidence) - parseFloat(a.confidence));
         
-            if (this.autoSuggestPatterns.length > 0) {
-                this.log('info', `Generated ${this.autoSuggestPatterns.length} auto-suggested filters`);
-                setTimeout(() => {
-                    try {
-                        this.showAutoSuggestedFilters();
-                    } catch (showError) {
-                        this.log('warning', `Error showing auto-suggestions: ${showError.message}`);
-                    }
-                }, 10);
-            } else {
-                this.log('info', 'No auto-suggestions generated');
-            }
+            // Auto-suggested filters feature disabled per user request
+            // if (this.autoSuggestPatterns.length > 0) {
+            //     this.log('info', `Generated ${this.autoSuggestPatterns.length} auto-suggested filters`);
+            //     setTimeout(() => {
+            //         try {
+            //             this.showAutoSuggestedFilters();
+            //         } catch (showError) {
+            //             this.log('warning', `Error showing auto-suggestions: ${showError.message}`);
+            //         }
+            //     }, 10);
+            // } else {
+            //     this.log('info', 'No auto-suggestions generated');
+            // }
         } catch (error) {
             this.log('error', `Error generating auto-suggestions: ${error.message}`);
             console.error('Auto-suggestion generation error:', error);
