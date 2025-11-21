@@ -9,6 +9,7 @@ function apiTestingTool() {
         apiKey: '',
         apiSecret: '',
         accountBalance: null,
+        ownedNumbers: [],
 
         // UI State
         currentTab: 'messages',
@@ -197,6 +198,8 @@ function apiTestingTool() {
                     this.addLog('success', 'Saved credentials loaded successfully');
                     // Fetch balance after loading credentials
                     await this.getBalance();
+                    // Fetch owned numbers after loading credentials
+                    await this.getOwnedNumbers();
                 } else {
                     this.addLog('info', 'No saved credentials found');
                 }
@@ -231,6 +234,35 @@ function apiTestingTool() {
                 }
             } catch (error) {
                 this.addLog('error', `Failed to fetch balance: ${error.message}`);
+            }
+        },
+
+        /**
+         * Get owned numbers
+         */
+        async getOwnedNumbers() {
+            try {
+                const response = await fetch('/api-testing/api/numbers/owned', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        api_key: this.apiKey,
+                        api_secret: this.apiSecret
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    this.ownedNumbers = data.numbers || [];
+                    this.addLog('info', `Found ${data.count || 0} owned numbers`);
+                } else {
+                    this.addLog('error', `Failed to fetch owned numbers: ${data.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                this.addLog('error', `Failed to fetch owned numbers: ${error.message}`);
             }
         },
 

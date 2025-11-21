@@ -138,6 +138,33 @@ export function setupApiTestingRoutes(app) {
         }
     });
 
+    // Get owned numbers
+    app.get(`${prefix}/numbers/owned`, async (req, res) => {
+        try {
+            const { session_id = 'default' } = req.query;
+            const session = sessions.get(session_id);
+
+            if (!session) {
+                return res.status(401).json({ error: 'Not connected. Please connect first.' });
+            }
+
+            const result = await session.vonage.numbers.getOwnedNumbers();
+
+            res.json({
+                success: true,
+                count: result.count || 0,
+                numbers: result.numbers || []
+            });
+        } catch (error) {
+            console.error('List numbers error:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                numbers: []
+            });
+        }
+    });
+
     // Send SMS
     app.post(`${prefix}/sms/send`, async (req, res) => {
         try {
