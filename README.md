@@ -1,11 +1,11 @@
 # Romain's Vonage Tools Hub
 
-**Version:** v1.2.0
+**Version:** v1.3.0
 **Author:** Romain EDIN
 
 A unified web-based hub for managing multiple Vonage telecommunications tools and utilities.
 
-![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)
 ![License](https://img.shields.io/badge/license-ISC-yellow.svg)
 
@@ -51,19 +51,27 @@ This hub provides a centralized interface for various Vonage management tools, a
 
 ---
 
-### 3. Vonage Numbers Manager (v2.2.2)
+### 3. Vonage Management Suite (v1.3.0)
 **Status:** ✅ Fully Functional
 
-**Purpose:** Comprehensive management interface for Vonage phone numbers.
+**Purpose:** Unified interface for managing Vonage phone numbers and subaccounts.
 
 **Features:**
-- **Credential Management:** Save, load, and delete API credentials locally
-- **Account Information:** Real-time balance display
-- **View Owned Numbers:** Complete listing with bulk selection
-- **Search Available Numbers:** Filter by country, type, features, and pattern
-- **Purchase Numbers:** Buy numbers with confirmation modal
-- **Cancel Numbers:** Remove numbers with safety warnings
-- **Real-time Logging:** WebSocket-powered activity monitoring
+- **Numbers Management Tab:**
+  - View owned numbers with bulk selection
+  - Search available numbers by country, type, and features
+  - Purchase numbers with confirmation
+  - Cancel numbers with safety warnings
+- **Subaccounts Management Tab:**
+  - List all subaccounts
+  - Create new subaccounts
+  - View subaccount balances
+  - Transfer credits between master and subaccounts
+- **Unified Features:**
+  - Credential management (save/load/delete)
+  - Real-time account balance display
+  - WebSocket-powered activity logging
+  - Tabbed interface for easy navigation
 
 **Tech Stack:**
 - Backend: Node.js + Express.js
@@ -71,78 +79,7 @@ This hub provides a centralized interface for various Vonage management tools, a
 - Real-time: WebSocket
 - API: Vonage Server SDK v3 + Auth
 
-**Access:** `/number-manager`
-
-#### Usage Instructions
-
-##### 1. Connect to Vonage API
-1. Enter your Vonage API Key and API Secret
-2. Click "Connect Account"
-3. Upon successful connection, your account balance and owned numbers will load automatically
-
-##### 2. Manage Credentials
-- **Save Credentials:** Click "Save Credentials" to store them locally (base64 encoded)
-- **Load Saved:** Click "Load Saved" to retrieve previously saved credentials
-- **Clear Fields:** Click "Clear Fields" to remove credentials from input fields
-
-##### 3. View Your Numbers
-- All owned numbers appear in the "Your Phone Numbers" section
-- Select numbers using checkboxes for bulk operations
-- Click "Refresh" to update the list
-
-##### 4. Search for Available Numbers
-1. Enter a 2-letter country code (e.g., US, GB, FR)
-2. Optionally select number type (Landline, Mobile, Toll-free)
-3. Choose required features (SMS, VOICE, MMS, or combinations)
-4. Add a pattern if searching for specific number sequences (e.g., 555*)
-5. Click "Search Available Numbers"
-
-##### 5. Purchase Numbers
-1. Select numbers from the search results using checkboxes
-2. Click "Buy Selected (X)" button
-3. Review the purchase confirmation modal
-4. Click "Confirm Purchase" to proceed
-5. Monitor the activity log for purchase status
-
-##### 6. Cancel Numbers
-1. Select numbers from your owned numbers using checkboxes
-2. Click "Cancel Selected (X)" button
-3. **Read the warning carefully** - this action is irreversible
-4. Confirm cancellation if you're certain
-5. Monitor the activity log for cancellation status
-
-##### 7. Activity Log
-- View real-time logs of all operations
-- Color-coded messages:
-  - 🟢 Green: Success/Info
-  - 🟡 Yellow: Warnings
-  - 🔴 Red: Errors
-- Toggle auto-scroll on/off
-- Clear log when needed
-
-#### Security Notes
-- Credentials are stored with base64 encoding (basic obfuscation)
-- Session-based architecture (no credentials stored on server)
-- All operations use secure HTTPS in production
-- Purchase and cancel operations require explicit confirmation
-
----
-
-### 4. Vonage Management Suite (v1.3.0)
-**Status:** ⏳ Coming Soon
-
-**Purpose:** Combined interface for numbers and subaccount balance management.
-
-**Planned Features:**
-- All Number Manager features
-- Subaccount balance viewing
-- Balance transfer between subaccounts
-- Balance history charts
-- Dual WebSocket logging
-
-**Tech Stack:** Node.js + Express + Alpine.js + Tailwind CSS + WebSocket
-
-**Access:** `/management-suite` (placeholder)
+**Access:** `/management-suite`
 
 ---
 
@@ -196,7 +133,7 @@ Romain-Vonage-Tools-Hub/
 │   ├── credentials.mjs      # Credential management
 │   └── vonageClient.mjs     # Vonage API client wrapper
 ├── api/                      # API route handlers
-│   └── numberManager.mjs    # Number Manager endpoints
+│   └── managementSuite.mjs  # Management Suite endpoints
 ├── data/                     # Local data storage (gitignored)
 │   └── vonage_credentials.json
 └── public/                   # Static frontend files
@@ -204,10 +141,9 @@ Romain-Vonage-Tools-Hub/
     ├── changelog.html       # Version history
     ├── rakuten-report/      # Rakuten tool
     ├── report-filtering/    # Filtering tool
-    ├── number-manager/      # Number Manager
-    │   ├── index.html       # Frontend UI
-    │   └── app.js           # Alpine.js component
-    └── management-suite/    # Management Suite (WIP)
+    └── management-suite/    # Management Suite
+        ├── index.html       # Frontend UI
+        └── app.js           # Alpine.js component
 ```
 
 ---
@@ -240,8 +176,8 @@ instance:
 - `GET /_/health` - VCR health check endpoint
 - `GET /health` - Detailed health status JSON
 
-### Number Manager API
-All endpoints are prefixed with `/number-manager/api/`
+### Management Suite API
+All endpoints are prefixed with `/management-suite/api/`
 
 #### Credentials
 - `GET /credentials/load` - Load saved credentials
@@ -261,10 +197,13 @@ All endpoints are prefixed with `/number-manager/api/`
 - `POST /numbers/cancel` - Cancel a number
 
 #### Subaccounts
-- `GET /subaccounts` - List subaccounts (placeholder)
+- `GET /subaccounts` - List all subaccounts
+- `POST /subaccounts/create` - Create new subaccount
+- `GET /subaccounts/balance/:apiKey` - Get subaccount balance
+- `POST /subaccounts/transfer` - Transfer credits between accounts
 
 ### WebSocket
-- `WS /number-manager/ws/logs` - Real-time activity logging
+- `WS /management-suite/ws/logs` - Real-time activity logging
 
 ---
 
@@ -272,14 +211,20 @@ All endpoints are prefixed with `/number-manager/api/`
 
 ### Manual Testing Checklist
 
-#### Number Manager
+#### Management Suite
 - [ ] Load/save/delete credentials
 - [ ] Connect to Vonage API with valid credentials
 - [ ] View account balance
-- [ ] List owned numbers
-- [ ] Search available numbers (various filters)
-- [ ] Purchase a number (use test account!)
-- [ ] Cancel a number (use test number!)
+- [ ] **Numbers Tab:**
+  - [ ] List owned numbers
+  - [ ] Search available numbers (various filters)
+  - [ ] Purchase a number (use test account!)
+  - [ ] Cancel a number (use test number!)
+- [ ] **Subaccounts Tab:**
+  - [ ] List subaccounts
+  - [ ] Create new subaccount
+  - [ ] View subaccount balance
+  - [ ] Transfer credits between accounts
 - [ ] WebSocket logging displays messages
 - [ ] All error states handled gracefully
 - [ ] Responsive design on mobile/tablet
@@ -288,26 +233,31 @@ All endpoints are prefixed with `/number-manager/api/`
 
 **Load credentials:**
 ```bash
-curl http://localhost:3000/number-manager/api/credentials/load
+curl http://localhost:3000/management-suite/api/credentials/load
 ```
 
 **Connect:**
 ```bash
-curl -X POST http://localhost:3000/number-manager/api/connect \
+curl -X POST http://localhost:3000/management-suite/api/connect \
   -H "Content-Type: application/json" \
   -d '{"api_key":"YOUR_KEY","api_secret":"YOUR_SECRET"}'
 ```
 
 **Get balance:**
 ```bash
-curl http://localhost:3000/number-manager/api/account/balance?session_id=default
+curl http://localhost:3000/management-suite/api/account/balance?session_id=default
 ```
 
 **Search numbers:**
 ```bash
-curl -X POST http://localhost:3000/number-manager/api/numbers/search \
+curl -X POST http://localhost:3000/management-suite/api/numbers/search \
   -H "Content-Type: application/json" \
   -d '{"country":"US","features":"SMS,VOICE","session_id":"default"}'
+```
+
+**List subaccounts:**
+```bash
+curl http://localhost:3000/management-suite/api/subaccounts?session_id=default
 ```
 
 ---
@@ -316,7 +266,7 @@ curl -X POST http://localhost:3000/number-manager/api/numbers/search \
 
 ### Common Issues
 
-#### 1. "Cannot read properties of undefined (reading 'getBalance')" ✅ FIXED in v1.2.0
+#### 1. "Cannot read properties of undefined (reading 'getBalance')" ✅ FIXED in v1.3.0
 **Symptom:** Balance shows "N/A" after connecting, error in logs
 **Cause:** Vonage SDK v3 requires proper Auth class initialization
 **Solution:** The SDK client now uses correct initialization:
@@ -330,7 +280,7 @@ const credentials = new Auth({
 });
 const vonage = new Vonage(credentials);
 ```
-**Status:** Fixed in v1.2.0 - restart server to apply fix
+**Status:** Fixed in v1.3.0 - restart server to apply fix
 
 #### 2. Port Already in Use
 **Symptom:** Server fails to start
@@ -345,7 +295,7 @@ kill -9 <PID>
 #### 3. WebSocket Connection Failed
 **Symptom:** Real-time logs not working
 **Solution:** Check browser console, ensure WebSocket URL is correct
-**Verify:** Should connect to `ws://localhost:3000/number-manager/ws/logs`
+**Verify:** Should connect to `ws://localhost:3000/management-suite/ws/logs`
 
 #### 4. Credentials Not Saving
 **Symptom:** Saved credentials not persisting
@@ -379,28 +329,25 @@ npm start
 
 ## 📊 Progress & Roadmap
 
-**Current Status:** ~60% Complete
+**Current Status:** 100% Complete - All Tools Operational! 🎉
 
-### Completed (v1.2.0)
+### Completed (v1.3.0)
 - ✅ Hub infrastructure and landing page
-- ✅ Rakuten Security Report Builder
-- ✅ Vonage Reports API Filter Tool
-- ✅ **Vonage Numbers Manager** (Backend + Frontend)
-  - ✅ All API endpoints
-  - ✅ Harmonized UI
+- ✅ Rakuten Security Report Builder (v2.2.0)
+- ✅ Vonage Reports API Filter Tool (v2.0.0)
+- ✅ **Vonage Management Suite (v1.3.0)** - Complete Numbers & Subaccounts Management
+  - ✅ All API endpoints (Numbers + Subaccounts)
+  - ✅ Tabbed interface (Numbers + Subaccounts)
+  - ✅ Harmonized UI with dark theme
   - ✅ WebSocket logging
   - ✅ Full testing completed
-  - ✅ SDK v3 fix applied
+  - ✅ SDK v3 fixes applied
 
-### In Progress
-- None currently
-
-### Upcoming
-- ⏳ Vonage Management Suite (Backend + Frontend)
-  - Estimated: 6-8 hours
-  - Combined Numbers + Subaccounts management
-- ⏳ Final testing and polish
-- ⏳ Additional documentation
+### Future Enhancements
+- Additional tool integrations as needed
+- Advanced analytics dashboards
+- Multi-user authentication system
+- Automated testing suite
 
 ---
 
@@ -416,13 +363,13 @@ npm start
 
 ## 📝 Changelog
 
-### v1.2.0 (2025-11-20)
+### v1.3.0 (2025-11-20)
 **Major Update: Management Suite Complete + Critical SDK Fixes**
 - 🎉 **NEW:** Vonage Management Suite (v1.3.0) - Unified Numbers & Subaccounts Management
 - ✨ Complete backend API for subaccounts (create, list, balance, transfer)
 - ✨ Tabbed frontend interface (Numbers + Subaccounts tabs)
 - ✨ Credit transfer functionality between master and subaccounts
-- ✨ Dual WebSocket logging for both Number Manager and Management Suite
+- ✨ Dual WebSocket logging for Management Suite
 - 🐛 **CRITICAL FIX:** Vonage SDK v3 API method names corrected
   - `account.getBalance()` → `accounts.getBalance()` (plural!)
   - `numbers.list()` → `numbers.getOwnedNumbers()`
@@ -446,7 +393,7 @@ npm start
 - ✨ Rakuten Report Builder integration
 - ✨ Report Filtering Tool integration
 - ✨ VCR deployment configuration
-- ✨ Number Manager backend complete
+- ✨ Management Suite backend complete
 
 ---
 
@@ -520,7 +467,7 @@ Copyright (c) 2025 Romain EDIN
 
 ---
 
-**Need Help?** Check the Troubleshooting section or review the activity logs in the Number Manager for detailed error messages.
+**Need Help?** Check the Troubleshooting section or review the activity logs in the Management Suite for detailed error messages.
 
 **Ready to Start?** Run `npm start` and visit `http://localhost:3000`
 

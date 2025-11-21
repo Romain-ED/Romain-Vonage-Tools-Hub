@@ -3,7 +3,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
-import numberManagerRouter from './api/numberManager.mjs';
 import managementSuiteRouter from './api/managementSuite.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -18,7 +17,6 @@ const server = createServer(app);
 
 // WebSocket server for logs
 const wss = new WebSocketServer({ noServer: true });
-const numberManagerClients = new Set();
 const managementSuiteClients = new Set();
 
 // Debug middleware to log all requests
@@ -33,28 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // WebSocket upgrade handler
 server.on('upgrade', (request, socket, head) => {
-    if (request.url === '/number-manager/ws/logs') {
-        wss.handleUpgrade(request, socket, head, (ws) => {
-            numberManagerClients.add(ws);
-
-            console.log('Number Manager WebSocket client connected');
-            ws.send(JSON.stringify({
-                type: 'info',
-                message: 'Connected to Number Manager logs',
-                timestamp: new Date().toISOString()
-            }));
-
-            ws.on('close', () => {
-                numberManagerClients.delete(ws);
-                console.log('Number Manager WebSocket client disconnected');
-            });
-
-            ws.on('error', (error) => {
-                console.error('WebSocket error:', error);
-                numberManagerClients.delete(ws);
-            });
-        });
-    } else if (request.url === '/management-suite/ws/logs') {
+    if (request.url === '/management-suite/ws/logs') {
         wss.handleUpgrade(request, socket, head, (ws) => {
             managementSuiteClients.add(ws);
 
@@ -80,7 +57,7 @@ server.on('upgrade', (request, socket, head) => {
     }
 });
 
-// Broadcast function for Number Manager logs
+// Broadcast function for Management Suite logs
 export function broadcastNumberManagerLog(message, type = 'info') {
     const logMessage = JSON.stringify({
         type: type,
@@ -88,18 +65,13 @@ export function broadcastNumberManagerLog(message, type = 'info') {
         timestamp: new Date().toISOString()
     });
 
-    // Broadcast to both Number Manager and Management Suite clients
-    // (since Management Suite uses the same Vonage client)
-    const allClients = [...numberManagerClients, ...managementSuiteClients];
-    allClients.forEach((client) => {
+    // Broadcast to Management Suite clients
+    managementSuiteClients.forEach((client) => {
         if (client.readyState === 1) { // WebSocket.OPEN
             client.send(logMessage);
         }
     });
 }
-
-// API routes for Number Manager
-app.use('/number-manager', numberManagerRouter);
 
 // API routes for Management Suite
 app.use('/management-suite', managementSuiteRouter);
@@ -122,11 +94,10 @@ app.get('/health', (req, res) => {
         status: 'healthy',
         timestamp: new Date().toISOString(),
         service: 'Romain Vonage Tools Hub',
-        version: '1.2.0',
+        version: '1.3.0',
         tools: {
             'rakuten-report': 'Rakuten Security Report Builder',
             'report-filtering': 'Vonage Reports API Filter Tool',
-            'number-manager': 'Vonage Numbers Manager',
             'management-suite': 'Vonage Management Suite'
         }
     });
@@ -143,7 +114,6 @@ server.listen(PORT, HOST, () => {
     console.log(`   - Landing Page: http://${HOST}:${PORT}/`);
     console.log(`   - Rakuten Report Builder: http://${HOST}:${PORT}/rakuten-report`);
     console.log(`   - Report Filtering Tool: http://${HOST}:${PORT}/report-filtering`);
-    console.log(`   - Number Manager: http://${HOST}:${PORT}/number-manager`);
     console.log(`   - Management Suite: http://${HOST}:${PORT}/management-suite`);
 
     // Test the health endpoint internally
