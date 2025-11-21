@@ -781,11 +781,11 @@ class CSVFilterTool {
                 { label: 'Columns', value: columnCount.toLocaleString() }
             ];
             
-            // Generate HTML
+            // Generate HTML with Tailwind CSS
             fileInfoGrid.innerHTML = fileInfoItems.map(item => `
-                <div class="file-info-item">
-                    <div class="file-info-label">${this.escapeHtml(item.label)}</div>
-                    <div class="file-info-value">${this.escapeHtml(item.value)}</div>
+                <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+                    <div class="text-xs font-bold text-blue-400 uppercase tracking-wide mb-1">${this.escapeHtml(item.label)}</div>
+                    <div class="text-lg font-semibold text-white">${this.escapeHtml(item.value)}</div>
                 </div>
             `).join('');
             
