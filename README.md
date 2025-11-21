@@ -1,11 +1,11 @@
 # Romain's Vonage Tools Hub
 
-**Version:** v1.4.0
+**Version:** v1.5.0
 **Author:** Romain EDIN
 
 A unified web-based hub for managing multiple Vonage telecommunications tools and utilities.
 
-![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)
 ![License](https://img.shields.io/badge/license-ISC-yellow.svg)
 
@@ -19,7 +19,7 @@ This hub provides a centralized interface for various Vonage management tools, a
 
 ## 🛠️ Available Tools
 
-### 1. CSV Analysis Suite (v3.0.0)
+### 1. CSV Analysis Suite (v3.1.0)
 **Status:** ✅ Fully Functional
 
 **Purpose:** Unified CSV processing powerhouse combining advanced filtering and Rakuten security analysis. Two specialized tools in one tabbed interface.
@@ -28,11 +28,16 @@ This hub provides a centralized interface for various Vonage management tools, a
 - **Report Filtering Tab:**
   - Advanced CSV filtering with regex support
   - Multiple export formats (CSV, JSON, Excel)
-  - Column analysis and statistics
+  - Enhanced column analysis with vibrant gradient visualizations
+  - Beautiful 8-color palette for data distribution charts
+  - Improved File Information cards with clear visual hierarchy
+  - Modern Tailwind CSS styling throughout
   - Internal fields removal
   - Real-time preview
 - **Rakuten Analysis Tab:**
-  - FC (Foreign Carrier) analysis
+  - FC (Foreign Carrier) analysis with sub-navigation
+  - DID/FC Mapping management page
+  - Documentation page with field reference
   - Call duration matrices (Originate × Terminate)
   - Interactive charts with Chart.js
   - Spreadsheet paste functionality
@@ -40,6 +45,7 @@ This hub provides a centralized interface for various Vonage management tools, a
 - Tabbed interface with deep linking (#filtering, #rakuten)
 - Consistent dark theme with Tailwind CSS
 - Unified Alpine.js state management
+- Professional footer with version information
 
 **Access:** `/csv-suite`
 
@@ -367,6 +373,21 @@ npm start
 ---
 
 ## 📝 Changelog
+
+### v1.5.0 (2025-11-21)
+**Major Update: CSV Suite Visualization Enhancements**
+- 🎨 **ENHANCED:** CSV Analysis Suite upgraded to v3.1.0
+- ✨ Removed Auto-Suggested Filters feature (streamlined UX)
+- ✨ Migrated Analysis Results to beautiful Tailwind CSS cards
+- ✨ Added vibrant 8-color gradient palette for data visualizations
+- ✨ Enhanced File Information section with bold labels and better hierarchy
+- ✨ Improved Filter Options with modern grid layout and labels
+- ✨ Added Rakuten sub-navigation (Upload, Mappings, Documentation pages)
+- ✨ Added DID/FC Mapping management page
+- ✨ Added comprehensive Documentation page with field reference
+- ✨ Added professional footer with version and links
+- 🎯 All gradient bar charts now with hover effects and smooth transitions
+- 📝 Updated all version numbers across documentation
 
 ### v1.4.0 (2025-11-21)
 **Major Update: CSV Tools Consolidation**
