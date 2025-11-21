@@ -12,8 +12,18 @@ export function setupApiTestingRoutes(app) {
     // Load saved credentials
     app.get(`${prefix}/credentials/load`, (req, res) => {
         try {
-            const result = credentialManager.loadCredentials();
-            res.json(result);
+            const credentials = credentialManager.loadCredentials();
+            if (credentials.api_key && credentials.api_secret) {
+                res.json({
+                    success: true,
+                    credentials: credentials
+                });
+            } else {
+                res.json({
+                    success: false,
+                    message: 'No saved credentials found'
+                });
+            }
         } catch (error) {
             res.status(500).json({
                 success: false,
@@ -35,7 +45,17 @@ export function setupApiTestingRoutes(app) {
             }
 
             const result = credentialManager.saveCredentials(api_key, api_secret);
-            res.json(result);
+            if (result) {
+                res.json({
+                    success: true,
+                    message: 'Credentials saved successfully'
+                });
+            } else {
+                res.status(500).json({
+                    success: false,
+                    message: 'Failed to save credentials'
+                });
+            }
         } catch (error) {
             res.status(500).json({
                 success: false,
@@ -48,7 +68,17 @@ export function setupApiTestingRoutes(app) {
     app.delete(`${prefix}/credentials`, (req, res) => {
         try {
             const result = credentialManager.deleteCredentials();
-            res.json(result);
+            if (result) {
+                res.json({
+                    success: true,
+                    message: 'Credentials deleted successfully'
+                });
+            } else {
+                res.status(500).json({
+                    success: false,
+                    message: 'Failed to delete credentials'
+                });
+            }
         } catch (error) {
             res.status(500).json({
                 success: false,
