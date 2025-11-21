@@ -192,14 +192,13 @@ function apiTestingTool() {
                 const response = await fetch('/api-testing/api/credentials/load');
                 const data = await response.json();
 
-                if (data.has_saved && data.credentials) {
+                if (data.success && data.credentials) {
                     this.apiKey = data.credentials.api_key || '';
                     this.apiSecret = data.credentials.api_secret || '';
                     this.addLog('success', 'Saved credentials loaded successfully');
-                    // Fetch balance after loading credentials
-                    await this.getBalance();
-                    // Fetch owned numbers after loading credentials
-                    await this.getOwnedNumbers();
+
+                    // Create session, then fetch balance and numbers
+                    await this.createSession();
                 } else {
                     this.addLog('info', 'No saved credentials found');
                 }
@@ -209,11 +208,11 @@ function apiTestingTool() {
         },
 
         /**
-         * Get account balance
+         * Create session with credentials
          */
-        async getBalance() {
+        async createSession() {
             try {
-                const response = await fetch('/api-testing/api/account/balance', {
+                const response = await fetch('/api-testing/api/connect', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -227,10 +226,32 @@ function apiTestingTool() {
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    this.accountBalance = data.balance;
-                    this.addLog('info', `Account balance: ${data.balance} EUR`);
+                    this.addLog('success', 'Session created successfully');
+                    // Now fetch balance and numbers
+                    await this.getBalance();
+                    await this.getOwnedNumbers();
                 } else {
-                    this.addLog('error', `Failed to fetch balance: ${data.message || 'Unknown error'}`);
+                    this.addLog('error', `Failed to create session: ${data.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                this.addLog('error', `Failed to create session: ${error.message}`);
+            }
+        },
+
+        /**
+         * Get account balance
+         */
+        async getBalance() {
+            try {
+                const response = await fetch('/api-testing/api/account/balance');
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    this.accountBalance = data.balance;
+                    this.addLog('info', `Account balance: €${data.balance}`);
+                } else {
+                    this.addLog('error', `Failed to fetch balance: ${data.error || 'Unknown error'}`);
                 }
             } catch (error) {
                 this.addLog('error', `Failed to fetch balance: ${error.message}`);
@@ -242,24 +263,15 @@ function apiTestingTool() {
          */
         async getOwnedNumbers() {
             try {
-                const response = await fetch('/api-testing/api/numbers/owned', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        api_key: this.apiKey,
-                        api_secret: this.apiSecret
-                    })
-                });
+                const response = await fetch('/api-testing/api/numbers/owned');
 
                 const data = await response.json();
 
                 if (response.ok && data.success) {
                     this.ownedNumbers = data.numbers || [];
-                    this.addLog('info', `Found ${data.count || 0} owned numbers`);
+                    this.addLog('info', `Found ${data.count || 0} owned number(s)`);
                 } else {
-                    this.addLog('error', `Failed to fetch owned numbers: ${data.message || 'Unknown error'}`);
+                    this.addLog('error', `Failed to fetch owned numbers: ${data.error || 'Unknown error'}`);
                 }
             } catch (error) {
                 this.addLog('error', `Failed to fetch owned numbers: ${error.message}`);
@@ -271,27 +283,17 @@ function apiTestingTool() {
          */
         async refreshBalance() {
             try {
-                const response = await fetch('/api-testing/api/account/balance', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        api_key: this.apiKey,
-                        api_secret: this.apiSecret
-                    })
-                });
+                const response = await fetch('/api-testing/api/account/balance');
 
                 const data = await response.json();
 
                 if (response.ok && data.success) {
                     this.accountBalance = data.balance;
-                    this.addLog('info', `Balance refreshed: ${data.balance} EUR`);
-                } else {
-                    this.addLog('error', `Failed to refresh balance: ${data.message || 'Unknown error'}`);
+                    this.addLog('info', `Balance refreshed: €${data.balance}`);
                 }
+                // Silently fail - don't log errors on refresh
             } catch (error) {
-                this.addLog('error', `Failed to refresh balance: ${error.message}`);
+                // Silently fail
             }
         },
 
