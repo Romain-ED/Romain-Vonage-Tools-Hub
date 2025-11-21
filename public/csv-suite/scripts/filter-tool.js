@@ -2455,20 +2455,22 @@ class CSVFilterTool {
             }
             
             const suggestionsHtml = `
-                <div class="auto-suggestions-section" id="autoSuggestionsSection">
-                    <h3>🤖 Auto-Suggested Filters</h3>
-                    <p class="suggestions-description">Based on data analysis, here are some recommended filters:</p>
-                    <div class="suggestions-grid">
+                <div class="bg-gray-700 rounded-lg p-6 border border-gray-600 mt-6" id="autoSuggestionsSection">
+                    <h3 class="text-xl font-bold text-white mb-3">
+                        <i class="fas fa-magic mr-2 text-purple-400"></i>Auto-Suggested Filters
+                    </h3>
+                    <p class="text-gray-400 mb-4">Based on data analysis, here are some recommended filters:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         ${this.autoSuggestPatterns.slice(0, 6).map((pattern, index) => `
-                            <div class="suggestion-card" onclick="if(window.csvTool) csvTool.applyAutoSuggestedFilter(${index})">
-                                <div class="suggestion-header">
-                                    <strong>${this.escapeHtml(pattern.column || '')}</strong>
-                                    <span class="confidence-badge">${pattern.confidence || '0'}%</span>
+                            <div class="bg-gray-800 border border-gray-600 rounded-lg p-4 cursor-pointer hover:border-purple-400 hover:shadow-lg transition-all duration-200" onclick="if(window.csvTool) csvTool.applyAutoSuggestedFilter(${index})">
+                                <div class="flex justify-between items-start mb-2">
+                                    <strong class="text-blue-400 text-sm font-semibold">${this.escapeHtml(pattern.column || '')}</strong>
+                                    <span class="bg-purple-500 bg-opacity-20 text-purple-400 text-xs px-2 py-1 rounded-full">${pattern.confidence || '0'}%</span>
                                 </div>
-                                <div class="suggestion-filter">
+                                <div class="text-gray-300 text-sm mb-2 font-mono">
                                     ${(pattern.operator || '').replace('_', ' ')} "${this.escapeHtml(pattern.value || '')}"
                                 </div>
-                                <div class="suggestion-reason">${this.escapeHtml(pattern.reason || '')}</div>
+                                <div class="text-gray-500 text-xs">${this.escapeHtml(pattern.reason || '')}</div>
                             </div>
                         `).join('')}
                     </div>
