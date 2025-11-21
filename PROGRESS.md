@@ -1,7 +1,7 @@
 # Romain's Vonage Tools Hub - Development Progress
 
 **Last Updated:** 2025-11-21
-**Current Version:** v1.5.0
+**Current Version:** v1.5.1
 **Status:** CSV Suite Enhanced - All Tools Operational!
 
 ---
@@ -21,7 +21,7 @@
 
 #### 1. CSV Analysis Suite ✅ (100% Complete)
 - **Status:** Fully integrated and working
-- **Version:** v3.1.0
+- **Version:** v3.1.1
 - **Tech Stack:** Alpine.js + Tailwind CSS + Chart.js + PapaParse
 - **Backend:** Static (client-side processing)
 - **Features:**
@@ -29,6 +29,8 @@
     - Advanced CSV filtering with regex
     - Multiple export formats (CSV, JSON, Excel)
     - Enhanced column analysis with vibrant visualizations
+    - Click-to-filter feature (click analysis values to create filters)
+    - Improved Results table with scrolling and pagination
     - Modern Tailwind CSS styling throughout
     - Improved File Information cards
     - Beautiful gradient bar charts with 8 color palette

@@ -1,11 +1,11 @@
 # Romain's Vonage Tools Hub
 
-**Version:** v1.5.0
+**Version:** v1.5.1
 **Author:** Romain EDIN
 
 A unified web-based hub for managing multiple Vonage telecommunications tools and utilities.
 
-![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.5.1-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)
 ![License](https://img.shields.io/badge/license-ISC-yellow.svg)
 
@@ -19,7 +19,7 @@ This hub provides a centralized interface for various Vonage management tools, a
 
 ## 🛠️ Available Tools
 
-### 1. CSV Analysis Suite (v3.1.0)
+### 1. CSV Analysis Suite (v3.1.1)
 **Status:** ✅ Fully Functional
 
 **Purpose:** Unified CSV processing powerhouse combining advanced filtering and Rakuten security analysis. Two specialized tools in one tabbed interface.
@@ -373,6 +373,18 @@ npm start
 ---
 
 ## 📝 Changelog
+
+### v1.5.1 (2025-11-21)
+**Update: UX Improvements & Click-to-Filter**
+- ✨ **NEW:** Click-to-filter feature in Analysis Results
+- ✨ Click any value in analysis charts to instantly create a filter
+- ✨ Improved Results table with horizontal/vertical scrolling
+- ✨ Reduced default pagination to 20 rows for better overview
+- ✨ Enhanced pagination with row count display and navigation
+- ✨ Sticky table header and first column when scrolling
+- ✨ Added whitespace-nowrap to prevent text wrapping in cells
+- 🎯 Better visual feedback on hover (cursor, colors, plus icon)
+- 📝 CSV Suite bumped to v3.1.1
 
 ### v1.5.0 (2025-11-21)
 **Major Update: CSV Suite Visualization Enhancements**
