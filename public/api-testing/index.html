@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vonage API Testing Tool - Romain's Tools Hub</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Highlight.js for JSON syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+
+    <style>
+        /* Custom scrollbar styling */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #374151;
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #6b7280;
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+        /* Terminal/Log styling */
+        .terminal-log {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            color: #10b981;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Code block styling */
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .code-block pre {
+            margin: 0;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+        }
+
+        /* Modal animations */
+        .modal-enter {
+            animation: modalFadeIn 0.2s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Smooth transitions */
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            backdrop-filter: blur(4px);
+        }
+
+        /* Tab active state */
+        .tab-active {
+            border-bottom: 2px solid #facc15;
+            color: #facc15;
+        }
+
+        /* Nested tab active state */
+        .subtab-active {
+            background-color: #374151;
+            color: #facc15;
+        }
+
+        /* History item styling */
+        .history-item {
+            border-left: 3px solid #6b7280;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            border-left-color: #facc15;
+            background-color: #374151;
+        }
+
+        .history-item.success {
+            border-left-color: #10b981;
+        }
+
+        .history-item.error {
+            border-left-color: #ef4444;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100" x-data="apiTestingTool()">
+    <!-- Navigation Header -->
+    <nav class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-vial text-yellow-400 text-2xl"></i>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Vonage API Testing Tool</h1>
+                        <p class="text-xs text-gray-400">Test Messages, Verify, Voice & Number Insight APIs v1.0.0</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="/" class="text-gray-300 hover:text-yellow-400 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-gray-700">
+                        <i class="fas fa-home mr-2"></i>Back to Hub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+        <!-- Credentials Section -->
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6 border border-gray-700">
+            <h2 class="text-2xl font-bold mb-4 text-yellow-400">
+                <i class="fas fa-key mr-2"></i>API Credentials
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="apiKey" class="block text-sm font-medium text-gray-300 mb-2">
+                        API Key:
+                    </label>
+                    <input
+                        type="text"
+                        id="apiKey"
+                        x-model="apiKey"
+                        placeholder="Enter your Vonage API Key"
+                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                    >
+                </div>
+
+                <div>
+                    <label for="apiSecret" class="block text-sm font-medium text-gray-300 mb-2">
+                        API Secret:
+                    </label>
+                    <input
+                        type="password"
+                        id="apiSecret"
+                        x-model="apiSecret"
+                        placeholder="Enter your Vonage API Secret"
+                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                    >
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-3 mb-4">
+                <button
+                    @click="clearCredentials()"
+                    class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+                >
+                    <i class="fas fa-times mr-2"></i>Clear Fields
+                </button>
+
+                <button
+                    @click="loadSavedCredentials()"
+                    class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+                >
+                    <i class="fas fa-download mr-2"></i>Load Saved
+                </button>
+
+                <button
+                    @click="saveCredentials()"
+                    :disabled="!apiKey || !apiSecret"
+                    class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <i class="fas fa-save mr-2"></i>Save Credentials
+                </button>
+            </div>
+
+            <!-- Connection Status -->
+            <div
+                class="p-4 rounded-lg"
+                :class="{
+                    'bg-green-900/30 border border-green-700': apiKey && apiSecret,
+                    'bg-yellow-900/30 border border-yellow-700': !apiKey || !apiSecret
+                }"
+            >
+                <p class="text-sm" x-text="apiKey && apiSecret ? 'Credentials configured - Ready to test APIs' : 'Enter credentials to begin testing'"></p>
+            </div>
+
+            <div class="mt-4 p-3 bg-yellow-900/30 border border-yellow-700 rounded-lg">
+                <p class="text-sm text-yellow-200">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Session-based mode: Credentials are not permanently stored on the server
+                </p>
+            </div>
+        </div>
+
+        <!-- API Testing Interface -->
+        <div class="bg-gray-800 rounded-lg shadow-xl border border-gray-700" x-show="apiKey && apiSecret">
+            <!-- Main Tab Headers -->
+            <div class="border-b border-gray-700">
+                <div class="flex overflow-x-auto custom-scrollbar">
+                    <button
+                        @click="currentTab = 'messages'"
+                        class="px-6 py-4 text-sm font-medium transition-colors hover:bg-gray-700 whitespace-nowrap"
+                        :class="currentTab === 'messages' ? 'tab-active' : 'text-gray-400'"
+                    >
+                        <i class="fas fa-comment-dots mr-2"></i>Messages API
+                    </button>
+                    <button
+                        @click="currentTab = 'verify'"
+                        class="px-6 py-4 text-sm font-medium transition-colors hover:bg-gray-700 whitespace-nowrap"
+                        :class="currentTab === 'verify' ? 'tab-active' : 'text-gray-400'"
+                    >
+                        <i class="fas fa-shield-alt mr-2"></i>Verify API
+                    </button>
+                    <button
+                        @click="currentTab = 'voice'"
+                        class="px-6 py-4 text-sm font-medium transition-colors hover:bg-gray-700 whitespace-nowrap"
+                        :class="currentTab === 'voice' ? 'tab-active' : 'text-gray-400'"
+                    >
+                        <i class="fas fa-phone mr-2"></i>Voice API
+                    </button>
+                    <button
+                        @click="currentTab = 'insight'"
+                        class="px-6 py-4 text-sm font-medium transition-colors hover:bg-gray-700 whitespace-nowrap"
+                        :class="currentTab === 'insight' ? 'tab-active' : 'text-gray-400'"
+                    >
+                        <i class="fas fa-info-circle mr-2"></i>Number Insight
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="p-6">
+                <!-- Messages API Tab -->
+                <div x-show="currentTab === 'messages'" class="space-y-6">
+                    <!-- Sub-tabs for Messages API -->
+                    <div class="flex gap-2 mb-4 border-b border-gray-700">
+                        <button
+                            @click="messagesSubTab = 'sms'"
+                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
+                            :class="messagesSubTab === 'sms' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
+                        >
+                            <i class="fas fa-sms mr-2"></i>SMS
+                        </button>
+                        <button
+                            @click="messagesSubTab = 'whatsapp'"
+                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
+                            :class="messagesSubTab === 'whatsapp' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
+                        >
+                            <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                        </button>
+                    </div>
+
+                    <!-- SMS Section -->
+                    <div x-show="messagesSubTab === 'sms'">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- SMS Input Form -->
+                            <div class="bg-gray-700/30 rounded-lg p-6">
+                                <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                                    <i class="fas fa-sms mr-2"></i>Send SMS
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">From:</label>
+                                        <input
+                                            type="text"
+                                            x-model="sms.from"
+                                            placeholder="e.g., YourBrand or 15551234567"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">To:</label>
+                                        <input
+                                            type="text"
+                                            x-model="sms.to"
+                                            placeholder="e.g., 15551234567"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Message:</label>
+                                        <textarea
+                                            x-model="sms.text"
+                                            rows="4"
+                                            placeholder="Enter your message..."
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        ></textarea>
+                                        <p class="text-xs text-gray-400 mt-1" x-text="'Characters: ' + (sms.text ? sms.text.length : 0)"></p>
+                                    </div>
+                                    <button
+                                        @click="sendSMS()"
+                                        :disabled="!sms.from || !sms.to || !sms.text || loading"
+                                        class="w-full px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <i class="fas fa-paper-plane mr-2"></i>
+                                        <span x-text="loading ? 'Sending...' : 'Send SMS'"></span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- SMS Request/Response -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="sms.request">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Request:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(sms.request)"></code></pre>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="sms.response">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Response:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(sms.response)"></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SMS History -->
+                        <div class="mt-6 bg-gray-700/30 rounded-lg p-4" x-show="history.sms.length > 0">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-sm font-bold text-gray-300">History:</h4>
+                                <button @click="history.sms = []" class="text-xs text-red-400 hover:text-red-300">
+                                    <i class="fas fa-trash mr-1"></i>Clear
+                                </button>
+                            </div>
+                            <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                                <template x-for="(item, index) in history.sms" :key="index">
+                                    <div
+                                        class="history-item p-3 rounded-lg bg-gray-800/50 cursor-pointer"
+                                        :class="item.success ? 'success' : 'error'"
+                                        @click="sms.request = item.request; sms.response = item.response"
+                                    >
+                                        <div class="flex items-center justify-between text-xs mb-1">
+                                            <span class="text-gray-400" x-text="item.timestamp"></span>
+                                            <span :class="item.success ? 'text-green-400' : 'text-red-400'" x-text="item.success ? 'Success' : 'Failed'"></span>
+                                        </div>
+                                        <div class="text-sm text-gray-300">
+                                            <span x-text="'To: ' + item.to"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WhatsApp Section -->
+                    <div x-show="messagesSubTab === 'whatsapp'">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- WhatsApp Input Form -->
+                            <div class="bg-gray-700/30 rounded-lg p-6">
+                                <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                                    <i class="fab fa-whatsapp mr-2"></i>Send WhatsApp Message
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">From (WhatsApp Number ID):</label>
+                                        <input
+                                            type="text"
+                                            x-model="whatsapp.from"
+                                            placeholder="e.g., 1234567890"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">To:</label>
+                                        <input
+                                            type="text"
+                                            x-model="whatsapp.to"
+                                            placeholder="e.g., 15551234567"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Message:</label>
+                                        <textarea
+                                            x-model="whatsapp.text"
+                                            rows="4"
+                                            placeholder="Enter your message..."
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        ></textarea>
+                                    </div>
+                                    <button
+                                        @click="sendWhatsApp()"
+                                        :disabled="!whatsapp.from || !whatsapp.to || !whatsapp.text || loading"
+                                        class="w-full px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <i class="fas fa-paper-plane mr-2"></i>
+                                        <span x-text="loading ? 'Sending...' : 'Send WhatsApp'"></span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- WhatsApp Request/Response -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="whatsapp.request">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Request:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(whatsapp.request)"></code></pre>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="whatsapp.response">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Response:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(whatsapp.response)"></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- WhatsApp History -->
+                        <div class="mt-6 bg-gray-700/30 rounded-lg p-4" x-show="history.whatsapp.length > 0">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-sm font-bold text-gray-300">History:</h4>
+                                <button @click="history.whatsapp = []" class="text-xs text-red-400 hover:text-red-300">
+                                    <i class="fas fa-trash mr-1"></i>Clear
+                                </button>
+                            </div>
+                            <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                                <template x-for="(item, index) in history.whatsapp" :key="index">
+                                    <div
+                                        class="history-item p-3 rounded-lg bg-gray-800/50 cursor-pointer"
+                                        :class="item.success ? 'success' : 'error'"
+                                        @click="whatsapp.request = item.request; whatsapp.response = item.response"
+                                    >
+                                        <div class="flex items-center justify-between text-xs mb-1">
+                                            <span class="text-gray-400" x-text="item.timestamp"></span>
+                                            <span :class="item.success ? 'text-green-400' : 'text-red-400'" x-text="item.success ? 'Success' : 'Failed'"></span>
+                                        </div>
+                                        <div class="text-sm text-gray-300">
+                                            <span x-text="'To: ' + item.to"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verify API Tab -->
+                <div x-show="currentTab === 'verify'" class="space-y-6">
+                    <!-- Sub-tabs for Verify API -->
+                    <div class="flex gap-2 mb-4 border-b border-gray-700">
+                        <button
+                            @click="verifySubTab = 'start'"
+                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
+                            :class="verifySubTab === 'start' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
+                        >
+                            <i class="fas fa-play mr-2"></i>Start Verification
+                        </button>
+                        <button
+                            @click="verifySubTab = 'check'"
+                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
+                            :class="verifySubTab === 'check' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
+                        >
+                            <i class="fas fa-check mr-2"></i>Check Code
+                        </button>
+                        <button
+                            @click="verifySubTab = 'cancel'"
+                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
+                            :class="verifySubTab === 'cancel' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
+                        >
+                            <i class="fas fa-times mr-2"></i>Cancel Verification
+                        </button>
+                    </div>
+
+                    <!-- Start Verification Section -->
+                    <div x-show="verifySubTab === 'start'">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Start Verification Form -->
+                            <div class="bg-gray-700/30 rounded-lg p-6">
+                                <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                                    <i class="fas fa-play mr-2"></i>Start Verification
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Number:</label>
+                                        <input
+                                            type="text"
+                                            x-model="verify.start.number"
+                                            placeholder="e.g., 15551234567"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Brand:</label>
+                                        <input
+                                            type="text"
+                                            x-model="verify.start.brand"
+                                            placeholder="e.g., YourCompany"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Workflow (optional):</label>
+                                        <select
+                                            x-model="verify.start.workflow"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                            <option value="">Default</option>
+                                            <option value="sms">SMS Only</option>
+                                            <option value="tts">Voice Only</option>
+                                        </select>
+                                    </div>
+                                    <button
+                                        @click="startVerification()"
+                                        :disabled="!verify.start.number || !verify.start.brand || loading"
+                                        class="w-full px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <i class="fas fa-play mr-2"></i>
+                                        <span x-text="loading ? 'Starting...' : 'Start Verification'"></span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Start Verification Request/Response -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="verify.start.request">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Request:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(verify.start.request)"></code></pre>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="verify.start.response">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Response:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(verify.start.response)"></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Start Verification History -->
+                        <div class="mt-6 bg-gray-700/30 rounded-lg p-4" x-show="history.verifyStart.length > 0">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-sm font-bold text-gray-300">History:</h4>
+                                <button @click="history.verifyStart = []" class="text-xs text-red-400 hover:text-red-300">
+                                    <i class="fas fa-trash mr-1"></i>Clear
+                                </button>
+                            </div>
+                            <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                                <template x-for="(item, index) in history.verifyStart" :key="index">
+                                    <div
+                                        class="history-item p-3 rounded-lg bg-gray-800/50 cursor-pointer"
+                                        :class="item.success ? 'success' : 'error'"
+                                        @click="verify.start.request = item.request; verify.start.response = item.response"
+                                    >
+                                        <div class="flex items-center justify-between text-xs mb-1">
+                                            <span class="text-gray-400" x-text="item.timestamp"></span>
+                                            <span :class="item.success ? 'text-green-400' : 'text-red-400'" x-text="item.success ? 'Success' : 'Failed'"></span>
+                                        </div>
+                                        <div class="text-sm text-gray-300">
+                                            <span x-text="'Number: ' + item.number"></span>
+                                            <span class="ml-2 text-gray-500" x-show="item.requestId" x-text="'Request ID: ' + item.requestId"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Check Code Section -->
+                    <div x-show="verifySubTab === 'check'">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Check Code Form -->
+                            <div class="bg-gray-700/30 rounded-lg p-6">
+                                <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                                    <i class="fas fa-check mr-2"></i>Check Verification Code
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Request ID:</label>
+                                        <input
+                                            type="text"
+                                            x-model="verify.check.requestId"
+                                            placeholder="From start verification response"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Verification Code:</label>
+                                        <input
+                                            type="text"
+                                            x-model="verify.check.code"
+                                            placeholder="e.g., 1234"
+                                            maxlength="6"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <button
+                                        @click="checkVerification()"
+                                        :disabled="!verify.check.requestId || !verify.check.code || loading"
+                                        class="w-full px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <i class="fas fa-check mr-2"></i>
+                                        <span x-text="loading ? 'Checking...' : 'Check Code'"></span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Check Code Request/Response -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="verify.check.request">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Request:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(verify.check.request)"></code></pre>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="verify.check.response">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Response:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(verify.check.response)"></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Check Code History -->
+                        <div class="mt-6 bg-gray-700/30 rounded-lg p-4" x-show="history.verifyCheck.length > 0">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-sm font-bold text-gray-300">History:</h4>
+                                <button @click="history.verifyCheck = []" class="text-xs text-red-400 hover:text-red-300">
+                                    <i class="fas fa-trash mr-1"></i>Clear
+                                </button>
+                            </div>
+                            <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                                <template x-for="(item, index) in history.verifyCheck" :key="index">
+                                    <div
+                                        class="history-item p-3 rounded-lg bg-gray-800/50 cursor-pointer"
+                                        :class="item.success ? 'success' : 'error'"
+                                        @click="verify.check.request = item.request; verify.check.response = item.response"
+                                    >
+                                        <div class="flex items-center justify-between text-xs mb-1">
+                                            <span class="text-gray-400" x-text="item.timestamp"></span>
+                                            <span :class="item.success ? 'text-green-400' : 'text-red-400'" x-text="item.success ? 'Success' : 'Failed'"></span>
+                                        </div>
+                                        <div class="text-sm text-gray-300">
+                                            <span x-text="'Request ID: ' + item.requestId"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cancel Verification Section -->
+                    <div x-show="verifySubTab === 'cancel'">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Cancel Verification Form -->
+                            <div class="bg-gray-700/30 rounded-lg p-6">
+                                <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                                    <i class="fas fa-times mr-2"></i>Cancel Verification
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Request ID:</label>
+                                        <input
+                                            type="text"
+                                            x-model="verify.cancel.requestId"
+                                            placeholder="From start verification response"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div class="bg-yellow-900/30 border border-yellow-700 rounded-lg p-3">
+                                        <p class="text-sm text-yellow-200">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                                            This will cancel an in-progress verification request.
+                                        </p>
+                                    </div>
+                                    <button
+                                        @click="cancelVerification()"
+                                        :disabled="!verify.cancel.requestId || loading"
+                                        class="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <i class="fas fa-times mr-2"></i>
+                                        <span x-text="loading ? 'Cancelling...' : 'Cancel Verification'"></span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Cancel Verification Request/Response -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="verify.cancel.request">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Request:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(verify.cancel.request)"></code></pre>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="verify.cancel.response">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Response:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(verify.cancel.response)"></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cancel Verification History -->
+                        <div class="mt-6 bg-gray-700/30 rounded-lg p-4" x-show="history.verifyCancel.length > 0">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-sm font-bold text-gray-300">History:</h4>
+                                <button @click="history.verifyCancel = []" class="text-xs text-red-400 hover:text-red-300">
+                                    <i class="fas fa-trash mr-1"></i>Clear
+                                </button>
+                            </div>
+                            <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                                <template x-for="(item, index) in history.verifyCancel" :key="index">
+                                    <div
+                                        class="history-item p-3 rounded-lg bg-gray-800/50 cursor-pointer"
+                                        :class="item.success ? 'success' : 'error'"
+                                        @click="verify.cancel.request = item.request; verify.cancel.response = item.response"
+                                    >
+                                        <div class="flex items-center justify-between text-xs mb-1">
+                                            <span class="text-gray-400" x-text="item.timestamp"></span>
+                                            <span :class="item.success ? 'text-green-400' : 'text-red-400'" x-text="item.success ? 'Success' : 'Failed'"></span>
+                                        </div>
+                                        <div class="text-sm text-gray-300">
+                                            <span x-text="'Request ID: ' + item.requestId"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voice API Tab -->
+                <div x-show="currentTab === 'voice'" class="space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- TTS Call Form -->
+                        <div class="bg-gray-700/30 rounded-lg p-6">
+                            <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                                <i class="fas fa-phone mr-2"></i>Text-to-Speech Call
+                            </h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">To:</label>
+                                    <input
+                                        type="text"
+                                        x-model="voice.to"
+                                        placeholder="e.g., 15551234567"
+                                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                    >
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Text to Speak:</label>
+                                    <textarea
+                                        x-model="voice.text"
+                                        rows="4"
+                                        placeholder="Enter the text to be spoken..."
+                                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                    ></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Voice (optional):</label>
+                                    <select
+                                        x-model="voice.voiceName"
+                                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                    >
+                                        <option value="">Default</option>
+                                        <option value="Joey">Joey (Male US)</option>
+                                        <option value="Amy">Amy (Female UK)</option>
+                                        <option value="Nicole">Nicole (Female AU)</option>
+                                        <option value="Russell">Russell (Male AU)</option>
+                                    </select>
+                                </div>
+                                <button
+                                    @click="makeTTSCall()"
+                                    :disabled="!voice.to || !voice.text || loading"
+                                    class="w-full px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <i class="fas fa-phone mr-2"></i>
+                                    <span x-text="loading ? 'Calling...' : 'Make TTS Call'"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Voice Request/Response -->
+                        <div class="space-y-4">
+                            <div class="bg-gray-700/30 rounded-lg p-4" x-show="voice.request">
+                                <h4 class="text-sm font-bold text-gray-300 mb-2">Request:</h4>
+                                <div class="code-block custom-scrollbar">
+                                    <pre><code class="language-json" x-html="highlightJson(voice.request)"></code></pre>
+                                </div>
+                            </div>
+                            <div class="bg-gray-700/30 rounded-lg p-4" x-show="voice.response">
+                                <h4 class="text-sm font-bold text-gray-300 mb-2">Response:</h4>
+                                <div class="code-block custom-scrollbar">
+                                    <pre><code class="language-json" x-html="highlightJson(voice.response)"></code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voice History -->
+                    <div class="mt-6 bg-gray-700/30 rounded-lg p-4" x-show="history.voice.length > 0">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-sm font-bold text-gray-300">History:</h4>
+                            <button @click="history.voice = []" class="text-xs text-red-400 hover:text-red-300">
+                                <i class="fas fa-trash mr-1"></i>Clear
+                            </button>
+                        </div>
+                        <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                            <template x-for="(item, index) in history.voice" :key="index">
+                                <div
+                                    class="history-item p-3 rounded-lg bg-gray-800/50 cursor-pointer"
+                                    :class="item.success ? 'success' : 'error'"
+                                    @click="voice.request = item.request; voice.response = item.response"
+                                >
+                                    <div class="flex items-center justify-between text-xs mb-1">
+                                        <span class="text-gray-400" x-text="item.timestamp"></span>
+                                        <span :class="item.success ? 'text-green-400' : 'text-red-400'" x-text="item.success ? 'Success' : 'Failed'"></span>
+                                    </div>
+                                    <div class="text-sm text-gray-300">
+                                        <span x-text="'To: ' + item.to"></span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Number Insight Tab -->
+                <div x-show="currentTab === 'insight'" class="space-y-6">
+                    <!-- Sub-tabs for Number Insight -->
+                    <div class="flex gap-2 mb-4 border-b border-gray-700">
+                        <button
+                            @click="insightSubTab = 'basic'"
+                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
+                            :class="insightSubTab === 'basic' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
+                        >
+                            <i class="fas fa-info mr-2"></i>Basic
+                        </button>
+                        <button
+                            @click="insightSubTab = 'standard'"
+                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
+                            :class="insightSubTab === 'standard' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
+                        >
+                            <i class="fas fa-info-circle mr-2"></i>Standard
+                        </button>
+                    </div>
+
+                    <!-- Basic Insight Section -->
+                    <div x-show="insightSubTab === 'basic'">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Basic Insight Form -->
+                            <div class="bg-gray-700/30 rounded-lg p-6">
+                                <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                                    <i class="fas fa-info mr-2"></i>Basic Number Insight
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Number:</label>
+                                        <input
+                                            type="text"
+                                            x-model="insight.basic.number"
+                                            placeholder="e.g., 15551234567"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div class="bg-blue-900/30 border border-blue-700 rounded-lg p-3">
+                                        <p class="text-sm text-blue-200">
+                                            <i class="fas fa-info-circle mr-2"></i>
+                                            Basic Insight returns country information and number formatting.
+                                        </p>
+                                    </div>
+                                    <button
+                                        @click="getBasicInsight()"
+                                        :disabled="!insight.basic.number || loading"
+                                        class="w-full px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <i class="fas fa-search mr-2"></i>
+                                        <span x-text="loading ? 'Looking up...' : 'Get Basic Insight'"></span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Basic Insight Request/Response -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="insight.basic.request">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Request:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(insight.basic.request)"></code></pre>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="insight.basic.response">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Response:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(insight.basic.response)"></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Basic Insight History -->
+                        <div class="mt-6 bg-gray-700/30 rounded-lg p-4" x-show="history.insightBasic.length > 0">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-sm font-bold text-gray-300">History:</h4>
+                                <button @click="history.insightBasic = []" class="text-xs text-red-400 hover:text-red-300">
+                                    <i class="fas fa-trash mr-1"></i>Clear
+                                </button>
+                            </div>
+                            <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                                <template x-for="(item, index) in history.insightBasic" :key="index">
+                                    <div
+                                        class="history-item p-3 rounded-lg bg-gray-800/50 cursor-pointer"
+                                        :class="item.success ? 'success' : 'error'"
+                                        @click="insight.basic.request = item.request; insight.basic.response = item.response"
+                                    >
+                                        <div class="flex items-center justify-between text-xs mb-1">
+                                            <span class="text-gray-400" x-text="item.timestamp"></span>
+                                            <span :class="item.success ? 'text-green-400' : 'text-red-400'" x-text="item.success ? 'Success' : 'Failed'"></span>
+                                        </div>
+                                        <div class="text-sm text-gray-300">
+                                            <span x-text="'Number: ' + item.number"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Standard Insight Section -->
+                    <div x-show="insightSubTab === 'standard'">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Standard Insight Form -->
+                            <div class="bg-gray-700/30 rounded-lg p-6">
+                                <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                                    <i class="fas fa-info-circle mr-2"></i>Standard Number Insight
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Number:</label>
+                                        <input
+                                            type="text"
+                                            x-model="insight.standard.number"
+                                            placeholder="e.g., 15551234567"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div class="bg-blue-900/30 border border-blue-700 rounded-lg p-3">
+                                        <p class="text-sm text-blue-200">
+                                            <i class="fas fa-info-circle mr-2"></i>
+                                            Standard Insight includes carrier information, number type, and portability status.
+                                        </p>
+                                    </div>
+                                    <button
+                                        @click="getStandardInsight()"
+                                        :disabled="!insight.standard.number || loading"
+                                        class="w-full px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <i class="fas fa-search mr-2"></i>
+                                        <span x-text="loading ? 'Looking up...' : 'Get Standard Insight'"></span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Standard Insight Request/Response -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="insight.standard.request">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Request:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(insight.standard.request)"></code></pre>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="insight.standard.response">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Response:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(insight.standard.response)"></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Standard Insight History -->
+                        <div class="mt-6 bg-gray-700/30 rounded-lg p-4" x-show="history.insightStandard.length > 0">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-sm font-bold text-gray-300">History:</h4>
+                                <button @click="history.insightStandard = []" class="text-xs text-red-400 hover:text-red-300">
+                                    <i class="fas fa-trash mr-1"></i>Clear
+                                </button>
+                            </div>
+                            <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                                <template x-for="(item, index) in history.insightStandard" :key="index">
+                                    <div
+                                        class="history-item p-3 rounded-lg bg-gray-800/50 cursor-pointer"
+                                        :class="item.success ? 'success' : 'error'"
+                                        @click="insight.standard.request = item.request; insight.standard.response = item.response"
+                                    >
+                                        <div class="flex items-center justify-between text-xs mb-1">
+                                            <span class="text-gray-400" x-text="item.timestamp"></span>
+                                            <span :class="item.success ? 'text-green-400' : 'text-red-400'" x-text="item.success ? 'Success' : 'Failed'"></span>
+                                        </div>
+                                        <div class="text-sm text-gray-300">
+                                            <span x-text="'Number: ' + item.number"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6 border border-gray-700">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-yellow-400">
+                    <i class="fas fa-clipboard-list mr-2"></i>Activity Log
+                </h2>
+                <div class="flex gap-2">
+                    <button
+                        @click="autoScroll = !autoScroll"
+                        class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                        <i class="fas fa-arrows-alt-v mr-2"></i>
+                        <span x-text="autoScroll ? 'Disable' : 'Enable'"></span> Auto-scroll
+                    </button>
+                    <button
+                        @click="logs = []"
+                        class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                        <i class="fas fa-trash mr-2"></i>Clear Log
+                    </button>
+                </div>
+            </div>
+
+            <div class="terminal-log custom-scrollbar p-4 rounded-lg border border-gray-700" id="logContainer">
+                <template x-for="(log, index) in logs" :key="index">
+                    <div class="mb-1">
+                        <span class="text-gray-400" x-text="log.timestamp"></span>
+                        <span
+                            class="font-semibold"
+                            :class="{
+                                'text-green-400': log.type === 'info' || log.type === 'success',
+                                'text-yellow-400': log.type === 'warning',
+                                'text-red-400': log.type === 'error'
+                            }"
+                            x-text="'[' + log.type.toUpperCase() + ']'"
+                        ></span>
+                        <span class="text-gray-200" x-text="log.message"></span>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div
+        x-show="loading"
+        x-transition
+        class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 loading-overlay"
+    >
+        <div class="bg-gray-800 rounded-lg p-8 border border-gray-700">
+            <div class="flex flex-col items-center">
+                <i class="fas fa-spinner fa-spin text-5xl text-yellow-400 mb-4"></i>
+                <p class="text-white text-lg" x-text="loadingMessage"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alpine.js Component Script -->
+    <script src="app.js"></script>
+</body>
+</html>

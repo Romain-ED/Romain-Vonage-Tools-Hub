@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import managementSuiteRouter from './api/managementSuite.mjs';
+import { setupApiTestingRoutes } from './api/apiTesting.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -75,6 +76,9 @@ export function broadcastNumberManagerLog(message, type = 'info') {
 
 // API routes for Management Suite
 app.use('/management-suite', managementSuiteRouter);
+
+// API routes for API Testing Tool
+setupApiTestingRoutes(app);
 
 // Serve static files from public directory
 app.use(express.static('public', {

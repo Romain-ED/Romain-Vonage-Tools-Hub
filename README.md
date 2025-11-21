@@ -1,11 +1,11 @@
 # Romain's Vonage Tools Hub
 
-**Version:** v1.5.1
+**Version:** v1.6.0
 **Author:** Romain EDIN
 
 A unified web-based hub for managing multiple Vonage telecommunications tools and utilities.
 
-![Version](https://img.shields.io/badge/version-1.5.1-blue.svg)
+![Version](https://img.shields.io/badge/version-1.6.0-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)
 ![License](https://img.shields.io/badge/license-ISC-yellow.svg)
 
@@ -85,6 +85,47 @@ This hub provides a centralized interface for various Vonage management tools, a
 
 ---
 
+### 3. Vonage API Testing Tool (v1.0.0)
+**Status:** ✅ Fully Functional
+
+**Purpose:** Interactive testing interface for Vonage APIs. Test messaging, voice, verify, and number insights with real-time request/response logging.
+
+**Features:**
+- **Messages API Page:**
+  - Send SMS messages
+  - Send WhatsApp messages
+  - Real-time request/response display
+  - Message history tracking
+- **Verify API Page:**
+  - Start verification workflows
+  - Check verification codes
+  - Cancel active verifications
+  - Request/response history
+- **Voice API Page:**
+  - Text-to-Speech (TTS) calls
+  - Outbound call testing
+  - Call history tracking
+- **Number Insight Page:**
+  - Basic number insights
+  - Standard number insights
+  - Detailed carrier information
+- **Unified Features:**
+  - Credential management (reused from Management Suite)
+  - Request/response display with JSON syntax highlighting
+  - History tracking for all API calls
+  - WebSocket-powered activity logging
+  - Page-based navigation
+
+**Tech Stack:**
+- Backend: Node.js + Express.js
+- Frontend: Alpine.js + Tailwind CSS
+- API: Vonage Server SDK v3 + Auth
+- Highlighting: Highlight.js
+
+**Access:** `/api-testing`
+
+---
+
 ## 🚀 Installation & Setup
 
 ### Prerequisites
@@ -135,7 +176,8 @@ Romain-Vonage-Tools-Hub/
 │   ├── credentials.mjs      # Credential management
 │   └── vonageClient.mjs     # Vonage API client wrapper
 ├── api/                      # API route handlers
-│   └── managementSuite.mjs  # Management Suite endpoints
+│   ├── managementSuite.mjs  # Management Suite endpoints
+│   └── apiTesting.mjs       # API Testing Tool endpoints
 ├── data/                     # Local data storage (gitignored)
 │   └── vonage_credentials.json
 └── public/                   # Static frontend files
@@ -148,7 +190,10 @@ Romain-Vonage-Tools-Hub/
     │   └── assets/          # Example files
     ├── rakuten-report/      # Legacy redirect → /csv-suite#rakuten
     ├── report-filtering/    # Legacy redirect → /csv-suite#filtering
-    └── management-suite/    # Management Suite
+    ├── management-suite/    # Management Suite
+    │   ├── index.html       # Frontend UI
+    │   └── app.js           # Alpine.js component
+    └── api-testing/         # API Testing Tool
         ├── index.html       # Frontend UI
         └── app.js           # Alpine.js component
 ```
@@ -211,6 +256,28 @@ All endpoints are prefixed with `/management-suite/api/`
 
 ### WebSocket
 - `WS /management-suite/ws/logs` - Real-time activity logging
+
+### API Testing Tool API
+All endpoints are prefixed with `/api-testing/api/`
+
+#### Connection
+- `POST /connect` - Connect to Vonage API with credentials
+
+#### Messages API
+- `POST /sms/send` - Send SMS message
+- `POST /whatsapp/send` - Send WhatsApp message
+
+#### Verify API
+- `POST /verify/start` - Start verification workflow
+- `POST /verify/check` - Check verification code
+- `POST /verify/cancel` - Cancel active verification
+
+#### Voice API
+- `POST /voice/tts` - Make Text-to-Speech call
+
+#### Number Insight API
+- `POST /insight/basic` - Get basic number insights
+- `POST /insight/standard` - Get standard number insights
 
 ---
 
@@ -373,6 +440,20 @@ npm start
 ---
 
 ## 📝 Changelog
+
+### v1.6.0 (2025-11-21)
+**Major Update: New API Testing Tool**
+- 🎉 **NEW:** Vonage API Testing Tool v1.0.0 - Interactive API testing interface
+- ✨ Test SMS, WhatsApp, Verify, Voice, and Number Insights APIs
+- ✨ Page-based navigation (Messages, Verify, Voice, Number Insight)
+- ✨ Request/response display with JSON syntax highlighting
+- ✨ History tracking for all API calls
+- ✨ Reused credential management from Management Suite
+- ✨ WebSocket-powered activity logging
+- ✨ Complete backend API endpoints for all Vonage APIs
+- 📝 Updated landing page with API Testing Tool card
+- 📝 Updated all documentation with new tool information
+- 📝 Hub now features 3 comprehensive tools
 
 ### v1.5.1 (2025-11-21)
 **Update: UX Improvements & Click-to-Filter**
