@@ -360,10 +360,7 @@ export function setupApiTestingRoutes(app) {
                 return res.status(401).json({ error: 'Not connected. Please connect first.' });
             }
 
-            const response = await session.vonage.numberInsight.get({
-                level: 'basic',
-                number
-            });
+            const response = await session.vonage.numberInsights.basicLookup(number);
 
             res.json({
                 success: true,
@@ -390,10 +387,7 @@ export function setupApiTestingRoutes(app) {
                 return res.status(401).json({ error: 'Not connected. Please connect first.' });
             }
 
-            const response = await session.vonage.numberInsight.get({
-                level: 'standard',
-                number
-            });
+            const response = await session.vonage.numberInsights.standardLookup(number);
 
             res.json({
                 success: true,
