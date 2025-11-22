@@ -196,8 +196,41 @@ export function setupApiTestingRoutes(app) {
         }
     });
 
-    // Send WhatsApp message
-    app.post(`${prefix}/whatsapp/send`, async (req, res) => {
+    // Send SMS via Messages API (unified messaging)
+    app.post(`${prefix}/messages/sms/send`, async (req, res) => {
+        try {
+            const { from, to, text, session_id = 'default' } = req.body;
+            const session = sessions.get(session_id);
+
+            if (!session) {
+                return res.status(401).json({ error: 'Not connected. Please connect first.' });
+            }
+
+            const response = await session.vonage.messages.send({
+                message_type: 'text',
+                channel: 'sms',
+                to,
+                from,
+                text
+            });
+
+            res.json({
+                success: true,
+                request: { from, to, text, channel: 'sms' },
+                response: response
+            });
+        } catch (error) {
+            console.error('Messages API SMS send error:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                details: error
+            });
+        }
+    });
+
+    // Send WhatsApp message via Messages API
+    app.post(`${prefix}/messages/whatsapp/send`, async (req, res) => {
         try {
             const { from, to, text, session_id = 'default' } = req.body;
             const session = sessions.get(session_id);
@@ -220,7 +253,7 @@ export function setupApiTestingRoutes(app) {
                 response: response
             });
         } catch (error) {
-            console.error('WhatsApp send error:', error);
+            console.error('Messages API WhatsApp send error:', error);
             res.status(500).json({
                 success: false,
                 error: error.message,
@@ -396,6 +429,97 @@ export function setupApiTestingRoutes(app) {
             });
         } catch (error) {
             console.error('Number Insight error:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                details: error
+            });
+        }
+    });
+
+    // Verify v2 - Start verification
+    app.post(`${prefix}/verify2/start`, async (req, res) => {
+        try {
+            const { brand, to, channel = 'sms', session_id = 'default' } = req.body;
+            const session = sessions.get(session_id);
+
+            if (!session) {
+                return res.status(401).json({ error: 'Not connected. Please connect first.' });
+            }
+
+            const workflow = [{
+                channel: channel,
+                to: to
+            }];
+
+            const response = await session.vonage.verify2.newRequest({
+                brand: brand || 'Vonage',
+                workflow: workflow
+            });
+
+            res.json({
+                success: true,
+                request: { brand, to, channel },
+                response: response,
+                request_id: response.request_id
+            });
+        } catch (error) {
+            console.error('Verify v2 start error:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                details: error
+            });
+        }
+    });
+
+    // Verify v2 - Check code
+    app.post(`${prefix}/verify2/check`, async (req, res) => {
+        try {
+            const { request_id, code, session_id = 'default' } = req.body;
+            const session = sessions.get(session_id);
+
+            if (!session) {
+                return res.status(401).json({ error: 'Not connected. Please connect first.' });
+            }
+
+            const response = await session.vonage.verify2.checkCode(request_id, code);
+
+            res.json({
+                success: true,
+                request: { request_id, code },
+                response: response,
+                status: response
+            });
+        } catch (error) {
+            console.error('Verify v2 check error:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                details: error
+            });
+        }
+    });
+
+    // Verify v2 - Cancel verification
+    app.post(`${prefix}/verify2/cancel`, async (req, res) => {
+        try {
+            const { request_id, session_id = 'default' } = req.body;
+            const session = sessions.get(session_id);
+
+            if (!session) {
+                return res.status(401).json({ error: 'Not connected. Please connect first.' });
+            }
+
+            const response = await session.vonage.verify2.cancel(request_id);
+
+            res.json({
+                success: true,
+                request: { request_id },
+                response: response
+            });
+        } catch (error) {
+            console.error('Verify v2 cancel error:', error);
             res.status(500).json({
                 success: false,
                 error: error.message,

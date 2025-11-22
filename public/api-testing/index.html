@@ -137,7 +137,7 @@
                     <i class="fas fa-vial text-yellow-400 text-2xl"></i>
                     <div>
                         <h1 class="text-xl font-bold text-white">Vonage API Testing Tool</h1>
-                        <p class="text-xs text-gray-400">Test Messages, Verify, Voice & Number Insight APIs v1.0.0</p>
+                        <p class="text-xs text-gray-400">Test SMS, Messages, Verify (v1 & v2), Voice & Number Insight APIs v2.0.0</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-3">
@@ -252,6 +252,13 @@
             <div class="border-b border-gray-700">
                 <div class="flex overflow-x-auto custom-scrollbar">
                     <button
+                        @click="currentTab = 'sms'"
+                        class="px-6 py-4 text-sm font-medium transition-colors hover:bg-gray-700 whitespace-nowrap"
+                        :class="currentTab === 'sms' ? 'tab-active' : 'text-gray-400'"
+                    >
+                        <i class="fas fa-sms mr-2"></i>SMS API
+                    </button>
+                    <button
                         @click="currentTab = 'messages'"
                         class="px-6 py-4 text-sm font-medium transition-colors hover:bg-gray-700 whitespace-nowrap"
                         :class="currentTab === 'messages' ? 'tab-active' : 'text-gray-400'"
@@ -263,7 +270,14 @@
                         class="px-6 py-4 text-sm font-medium transition-colors hover:bg-gray-700 whitespace-nowrap"
                         :class="currentTab === 'verify' ? 'tab-active' : 'text-gray-400'"
                     >
-                        <i class="fas fa-shield-alt mr-2"></i>Verify API
+                        <i class="fas fa-shield-alt mr-2"></i>Verify v1 API
+                    </button>
+                    <button
+                        @click="currentTab = 'verify2'"
+                        class="px-6 py-4 text-sm font-medium transition-colors hover:bg-gray-700 whitespace-nowrap"
+                        :class="currentTab === 'verify2' ? 'tab-active' : 'text-gray-400'"
+                    >
+                        <i class="fas fa-shield-halved mr-2"></i>Verify v2 API
                     </button>
                     <button
                         @click="currentTab = 'voice'"
@@ -277,36 +291,25 @@
                         class="px-6 py-4 text-sm font-medium transition-colors hover:bg-gray-700 whitespace-nowrap"
                         :class="currentTab === 'insight' ? 'tab-active' : 'text-gray-400'"
                     >
-                        <i class="fas fa-info-circle mr-2"></i>Number Insight
+                        <i class="fas fa-info-circle mr-2"></i>Number Insight API
                     </button>
                 </div>
             </div>
 
             <!-- Tab Content -->
             <div class="p-6">
-                <!-- Messages API Tab -->
-                <div x-show="currentTab === 'messages'" class="space-y-6">
-                    <!-- Sub-tabs for Messages API -->
-                    <div class="flex gap-2 mb-4 border-b border-gray-700">
-                        <button
-                            @click="messagesSubTab = 'sms'"
-                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
-                            :class="messagesSubTab === 'sms' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
-                        >
-                            <i class="fas fa-sms mr-2"></i>SMS
-                        </button>
-                        <button
-                            @click="messagesSubTab = 'whatsapp'"
-                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
-                            :class="messagesSubTab === 'whatsapp' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
-                        >
-                            <i class="fab fa-whatsapp mr-2"></i>WhatsApp
-                        </button>
+                <!-- SMS API Tab (Legacy SMS API) -->
+                <div x-show="currentTab === 'sms'" class="space-y-6">
+                    <div class="bg-blue-900/30 border border-blue-700 rounded-lg p-4">
+                        <h3 class="text-lg font-bold text-blue-300 mb-2">
+                            <i class="fas fa-info-circle mr-2"></i>SMS API (Legacy)
+                        </h3>
+                        <p class="text-sm text-blue-200">
+                            This is the legacy SMS API using <code class="bg-blue-800/50 px-2 py-1 rounded">vonage.sms.send()</code>.
+                            For new applications, consider using the <strong>Messages API</strong> tab which supports SMS, WhatsApp, Viber, and other channels through a unified interface.
+                        </p>
                     </div>
-
-                    <!-- SMS Section -->
-                    <div x-show="messagesSubTab === 'sms'">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <!-- SMS Input Form -->
                             <div class="bg-gray-700/30 rounded-lg p-6">
                                 <h3 class="text-xl font-bold mb-4 text-yellow-400">
@@ -412,15 +415,149 @@
                                 </template>
                             </div>
                         </div>
+                </div>
+
+                <!-- Messages API Tab (Unified Messaging) -->
+                <div x-show="currentTab === 'messages'" class="space-y-6">
+                    <div class="bg-purple-900/30 border border-purple-700 rounded-lg p-4">
+                        <h3 class="text-lg font-bold text-purple-300 mb-2">
+                            <i class="fas fa-comment-dots mr-2"></i>Messages API (Unified Messaging)
+                        </h3>
+                        <p class="text-sm text-purple-200">
+                            This is the modern Messages API using <code class="bg-purple-800/50 px-2 py-1 rounded">vonage.messages.send()</code>.
+                            It supports multiple channels: SMS, WhatsApp, Viber, Facebook Messenger, and more through a single, unified interface.
+                        </p>
                     </div>
 
-                    <!-- WhatsApp Section -->
+                    <!-- Sub-tabs for Messages API -->
+                    <div class="flex gap-2 mb-4 border-b border-gray-700">
+                        <button
+                            @click="messagesSubTab = 'sms'"
+                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
+                            :class="messagesSubTab === 'sms' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
+                        >
+                            <i class="fas fa-sms mr-2"></i>SMS
+                        </button>
+                        <button
+                            @click="messagesSubTab = 'whatsapp'"
+                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
+                            :class="messagesSubTab === 'whatsapp' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
+                        >
+                            <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                        </button>
+                    </div>
+
+                    <!-- Messages API SMS Section -->
+                    <div x-show="messagesSubTab === 'sms'">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- SMS Input Form -->
+                            <div class="bg-gray-700/30 rounded-lg p-6">
+                                <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                                    <i class="fas fa-sms mr-2"></i>Send SMS (Messages API)
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">From:</label>
+                                        <select
+                                            x-show="ownedNumbers.length > 0"
+                                            x-model="messagesSms.from"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                            <option value="">Select a number...</option>
+                                            <template x-for="number in ownedNumbers" :key="number.msisdn">
+                                                <option :value="number.msisdn" x-text="number.msisdn + ' (' + number.country + ' - ' + number.type + ')'"></option>
+                                            </template>
+                                        </select>
+                                        <input
+                                            x-show="ownedNumbers.length === 0"
+                                            type="text"
+                                            x-model="messagesSms.from"
+                                            placeholder="e.g., YourBrand or 15551234567"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">To:</label>
+                                        <input
+                                            type="text"
+                                            x-model="messagesSms.to"
+                                            placeholder="e.g., 15551234567"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Message:</label>
+                                        <textarea
+                                            x-model="messagesSms.text"
+                                            rows="4"
+                                            placeholder="Enter your message..."
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        ></textarea>
+                                        <p class="text-xs text-gray-400 mt-1" x-text="'Characters: ' + (messagesSms.text ? messagesSms.text.length : 0)"></p>
+                                    </div>
+                                    <button
+                                        @click="sendMessagesSMS()"
+                                        :disabled="!messagesSms.from || !messagesSms.to || !messagesSms.text || loading"
+                                        class="w-full px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <i class="fas fa-paper-plane mr-2"></i>
+                                        <span x-text="loading ? 'Sending...' : 'Send SMS (Messages API)'"></span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- SMS Request/Response -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="messagesSms.request">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Request:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(messagesSms.request)"></code></pre>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="messagesSms.response">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Response:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(messagesSms.response)"></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SMS History -->
+                        <div class="mt-6 bg-gray-700/30 rounded-lg p-4" x-show="history.messagesSms.length > 0">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-sm font-bold text-gray-300">History:</h4>
+                                <button @click="history.messagesSms = []" class="text-xs text-red-400 hover:text-red-300">
+                                    <i class="fas fa-trash mr-1"></i>Clear
+                                </button>
+                            </div>
+                            <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                                <template x-for="(item, index) in history.messagesSms" :key="index">
+                                    <div
+                                        class="history-item p-3 rounded-lg bg-gray-800/50 cursor-pointer"
+                                        :class="item.success ? 'success' : 'error'"
+                                        @click="messagesSms.request = item.request; messagesSms.response = item.response"
+                                    >
+                                        <div class="flex items-center justify-between text-xs mb-1">
+                                            <span class="text-gray-400" x-text="item.timestamp"></span>
+                                            <span :class="item.success ? 'text-green-400' : 'text-red-400'" x-text="item.success ? 'Success' : 'Failed'"></span>
+                                        </div>
+                                        <div class="text-sm text-gray-300">
+                                            <span x-text="'To: ' + item.to"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages API WhatsApp Section -->
                     <div x-show="messagesSubTab === 'whatsapp'">
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <!-- WhatsApp Input Form -->
                             <div class="bg-gray-700/30 rounded-lg p-6">
                                 <h3 class="text-xl font-bold mb-4 text-yellow-400">
-                                    <i class="fab fa-whatsapp mr-2"></i>Send WhatsApp Message
+                                    <i class="fab fa-whatsapp mr-2"></i>Send WhatsApp (Messages API)
                                 </h3>
                                 <div class="space-y-4">
                                     <div>
@@ -779,6 +916,303 @@
                                         class="history-item p-3 rounded-lg bg-gray-800/50 cursor-pointer"
                                         :class="item.success ? 'success' : 'error'"
                                         @click="verify.cancel.request = item.request; verify.cancel.response = item.response"
+                                    >
+                                        <div class="flex items-center justify-between text-xs mb-1">
+                                            <span class="text-gray-400" x-text="item.timestamp"></span>
+                                            <span :class="item.success ? 'text-green-400' : 'text-red-400'" x-text="item.success ? 'Success' : 'Failed'"></span>
+                                        </div>
+                                        <div class="text-sm text-gray-300">
+                                            <span x-text="'Request ID: ' + item.requestId"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verify v2 API Tab -->
+                <div x-show="currentTab === 'verify2'" class="space-y-6">
+                    <div class="bg-green-900/30 border border-green-700 rounded-lg p-4">
+                        <h3 class="text-lg font-bold text-green-300 mb-2">
+                            <i class="fas fa-shield-halved mr-2"></i>Verify v2 API (New)
+                        </h3>
+                        <p class="text-sm text-green-200">
+                            This is the new Verify v2 API using <code class="bg-green-800/50 px-2 py-1 rounded">vonage.verify2.newRequest()</code>.
+                            It offers improved workflow management, better channel support, and enhanced security features compared to Verify v1.
+                        </p>
+                    </div>
+
+                    <!-- Sub-tabs for Verify v2 API -->
+                    <div class="flex gap-2 mb-4 border-b border-gray-700">
+                        <button
+                            @click="verify2SubTab = 'start'"
+                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
+                            :class="verify2SubTab === 'start' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
+                        >
+                            <i class="fas fa-play mr-2"></i>Start Verification
+                        </button>
+                        <button
+                            @click="verify2SubTab = 'check'"
+                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
+                            :class="verify2SubTab === 'check' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
+                        >
+                            <i class="fas fa-check mr-2"></i>Check Code
+                        </button>
+                        <button
+                            @click="verify2SubTab = 'cancel'"
+                            class="px-4 py-2 text-sm font-medium transition-colors rounded-t-lg"
+                            :class="verify2SubTab === 'cancel' ? 'subtab-active' : 'text-gray-400 hover:bg-gray-700'"
+                        >
+                            <i class="fas fa-times mr-2"></i>Cancel Verification
+                        </button>
+                    </div>
+
+                    <!-- Start Verification Section -->
+                    <div x-show="verify2SubTab === 'start'">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Start Verification Form -->
+                            <div class="bg-gray-700/30 rounded-lg p-6">
+                                <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                                    <i class="fas fa-play mr-2"></i>Start Verification (v2)
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">To Number:</label>
+                                        <input
+                                            type="text"
+                                            x-model="verify2.start.to"
+                                            placeholder="e.g., 15551234567"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Brand:</label>
+                                        <input
+                                            type="text"
+                                            x-model="verify2.start.brand"
+                                            placeholder="e.g., YourCompany"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Channel:</label>
+                                        <select
+                                            x-model="verify2.start.channel"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                            <option value="sms">SMS</option>
+                                            <option value="whatsapp">WhatsApp</option>
+                                            <option value="voice">Voice</option>
+                                        </select>
+                                    </div>
+                                    <button
+                                        @click="startVerification2()"
+                                        :disabled="!verify2.start.to || !verify2.start.brand || loading"
+                                        class="w-full px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <i class="fas fa-play mr-2"></i>
+                                        <span x-text="loading ? 'Starting...' : 'Start Verification (v2)'"></span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Start Verification Request/Response -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="verify2.start.request">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Request:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(verify2.start.request)"></code></pre>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="verify2.start.response">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Response:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(verify2.start.response)"></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Start Verification History -->
+                        <div class="mt-6 bg-gray-700/30 rounded-lg p-4" x-show="history.verify2Start.length > 0">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-sm font-bold text-gray-300">History:</h4>
+                                <button @click="history.verify2Start = []" class="text-xs text-red-400 hover:text-red-300">
+                                    <i class="fas fa-trash mr-1"></i>Clear
+                                </button>
+                            </div>
+                            <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                                <template x-for="(item, index) in history.verify2Start" :key="index">
+                                    <div
+                                        class="history-item p-3 rounded-lg bg-gray-800/50 cursor-pointer"
+                                        :class="item.success ? 'success' : 'error'"
+                                        @click="verify2.start.request = item.request; verify2.start.response = item.response"
+                                    >
+                                        <div class="flex items-center justify-between text-xs mb-1">
+                                            <span class="text-gray-400" x-text="item.timestamp"></span>
+                                            <span :class="item.success ? 'text-green-400' : 'text-red-400'" x-text="item.success ? 'Success' : 'Failed'"></span>
+                                        </div>
+                                        <div class="text-sm text-gray-300">
+                                            <span x-text="'To: ' + item.to"></span>
+                                            <span class="ml-2 text-gray-500" x-show="item.requestId" x-text="'Request ID: ' + item.requestId"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Check Code Section -->
+                    <div x-show="verify2SubTab === 'check'">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Check Code Form -->
+                            <div class="bg-gray-700/30 rounded-lg p-6">
+                                <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                                    <i class="fas fa-check mr-2"></i>Check Verification Code (v2)
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Request ID:</label>
+                                        <input
+                                            type="text"
+                                            x-model="verify2.check.requestId"
+                                            placeholder="From start verification response"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Verification Code:</label>
+                                        <input
+                                            type="text"
+                                            x-model="verify2.check.code"
+                                            placeholder="e.g., 1234"
+                                            maxlength="6"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <button
+                                        @click="checkVerification2()"
+                                        :disabled="!verify2.check.requestId || !verify2.check.code || loading"
+                                        class="w-full px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <i class="fas fa-check mr-2"></i>
+                                        <span x-text="loading ? 'Checking...' : 'Check Code (v2)'"></span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Check Code Request/Response -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="verify2.check.request">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Request:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(verify2.check.request)"></code></pre>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="verify2.check.response">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Response:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(verify2.check.response)"></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Check Code History -->
+                        <div class="mt-6 bg-gray-700/30 rounded-lg p-4" x-show="history.verify2Check.length > 0">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-sm font-bold text-gray-300">History:</h4>
+                                <button @click="history.verify2Check = []" class="text-xs text-red-400 hover:text-red-300">
+                                    <i class="fas fa-trash mr-1"></i>Clear
+                                </button>
+                            </div>
+                            <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                                <template x-for="(item, index) in history.verify2Check" :key="index">
+                                    <div
+                                        class="history-item p-3 rounded-lg bg-gray-800/50 cursor-pointer"
+                                        :class="item.success ? 'success' : 'error'"
+                                        @click="verify2.check.request = item.request; verify2.check.response = item.response"
+                                    >
+                                        <div class="flex items-center justify-between text-xs mb-1">
+                                            <span class="text-gray-400" x-text="item.timestamp"></span>
+                                            <span :class="item.success ? 'text-green-400' : 'text-red-400'" x-text="item.success ? 'Success' : 'Failed'"></span>
+                                        </div>
+                                        <div class="text-sm text-gray-300">
+                                            <span x-text="'Request ID: ' + item.requestId"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cancel Verification Section -->
+                    <div x-show="verify2SubTab === 'cancel'">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Cancel Verification Form -->
+                            <div class="bg-gray-700/30 rounded-lg p-6">
+                                <h3 class="text-xl font-bold mb-4 text-yellow-400">
+                                    <i class="fas fa-times mr-2"></i>Cancel Verification (v2)
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Request ID:</label>
+                                        <input
+                                            type="text"
+                                            x-model="verify2.cancel.requestId"
+                                            placeholder="From start verification response"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        >
+                                    </div>
+                                    <div class="bg-yellow-900/30 border border-yellow-700 rounded-lg p-3">
+                                        <p class="text-sm text-yellow-200">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                                            This will cancel an in-progress verification request.
+                                        </p>
+                                    </div>
+                                    <button
+                                        @click="cancelVerification2()"
+                                        :disabled="!verify2.cancel.requestId || loading"
+                                        class="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <i class="fas fa-times mr-2"></i>
+                                        <span x-text="loading ? 'Cancelling...' : 'Cancel Verification (v2)'"></span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Cancel Verification Request/Response -->
+                            <div class="space-y-4">
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="verify2.cancel.request">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Request:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(verify2.cancel.request)"></code></pre>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-700/30 rounded-lg p-4" x-show="verify2.cancel.response">
+                                    <h4 class="text-sm font-bold text-gray-300 mb-2">Response:</h4>
+                                    <div class="code-block custom-scrollbar">
+                                        <pre><code class="language-json" x-html="highlightJson(verify2.cancel.response)"></code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cancel Verification History -->
+                        <div class="mt-6 bg-gray-700/30 rounded-lg p-4" x-show="history.verify2Cancel.length > 0">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-sm font-bold text-gray-300">History:</h4>
+                                <button @click="history.verify2Cancel = []" class="text-xs text-red-400 hover:text-red-300">
+                                    <i class="fas fa-trash mr-1"></i>Clear
+                                </button>
+                            </div>
+                            <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                                <template x-for="(item, index) in history.verify2Cancel" :key="index">
+                                    <div
+                                        class="history-item p-3 rounded-lg bg-gray-800/50 cursor-pointer"
+                                        :class="item.success ? 'success' : 'error'"
+                                        @click="verify2.cancel.request = item.request; verify2.cancel.response = item.response"
                                     >
                                         <div class="flex items-center justify-between text-xs mb-1">
                                             <span class="text-gray-400" x-text="item.timestamp"></span>

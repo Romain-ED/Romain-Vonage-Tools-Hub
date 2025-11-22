@@ -14,14 +14,15 @@ function apiTestingTool() {
         ownedNumbers: [],
 
         // UI State
-        currentTab: 'messages',
+        currentTab: 'sms',
         messagesSubTab: 'sms',
         verifySubTab: 'start',
+        verify2SubTab: 'start',
         insightSubTab: 'basic',
         loading: false,
         loadingMessage: 'Processing...',
 
-        // SMS State
+        // SMS API State (Legacy)
         sms: {
             from: '',
             to: '',
@@ -30,7 +31,16 @@ function apiTestingTool() {
             response: null
         },
 
-        // WhatsApp State
+        // Messages API SMS State
+        messagesSms: {
+            from: '',
+            to: '',
+            text: '',
+            request: null,
+            response: null
+        },
+
+        // Messages API WhatsApp State
         whatsapp: {
             from: '',
             to: '',
@@ -39,7 +49,7 @@ function apiTestingTool() {
             response: null
         },
 
-        // Verify State
+        // Verify v1 State
         verify: {
             start: {
                 number: '',
@@ -70,6 +80,28 @@ function apiTestingTool() {
             response: null
         },
 
+        // Verify v2 State
+        verify2: {
+            start: {
+                to: '',
+                brand: '',
+                channel: 'sms',
+                request: null,
+                response: null
+            },
+            check: {
+                requestId: '',
+                code: '',
+                request: null,
+                response: null
+            },
+            cancel: {
+                requestId: '',
+                request: null,
+                response: null
+            }
+        },
+
         // Number Insight State
         insight: {
             basic: {
@@ -87,10 +119,14 @@ function apiTestingTool() {
         // History
         history: {
             sms: [],
+            messagesSms: [],
             whatsapp: [],
             verifyStart: [],
             verifyCheck: [],
             verifyCancel: [],
+            verify2Start: [],
+            verify2Check: [],
+            verify2Cancel: [],
             voice: [],
             insightBasic: [],
             insightStandard: []
@@ -105,7 +141,8 @@ function apiTestingTool() {
          * Initialize component
          */
         init() {
-            this.addLog('info', 'Welcome to Vonage API Testing Tool v1.0.0');
+            this.addLog('info', 'Welcome to Vonage API Testing Tool v2.0.0');
+            this.addLog('info', 'Test SMS, Messages, Verify (v1 & v2), Voice & Number Insight APIs');
             this.addLog('info', 'Enter your API credentials to begin testing');
             this.connectWebSocket();
 
@@ -406,7 +443,71 @@ function apiTestingTool() {
         },
 
         /**
-         * Send WhatsApp message
+         * Send SMS via Messages API
+         */
+        async sendMessagesSMS() {
+            this.loading = true;
+            this.loadingMessage = 'Sending SMS via Messages API...';
+            this.addLog('info', `Sending SMS via Messages API to ${this.messagesSms.to}...`);
+
+            const requestData = {
+                api_key: this.apiKey,
+                api_secret: this.apiSecret,
+                from: this.messagesSms.from,
+                to: this.messagesSms.to,
+                text: this.messagesSms.text
+            };
+
+            this.messagesSms.request = JSON.stringify(requestData, null, 2);
+
+            try {
+                const response = await fetch('/api-testing/api/messages/sms/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const data = await response.json();
+                this.messagesSms.response = JSON.stringify(data, null, 2);
+
+                const success = response.ok && data.success;
+
+                if (success) {
+                    this.addLog('success', `SMS sent successfully via Messages API to ${this.messagesSms.to}`);
+                    await this.refreshBalance();
+                } else {
+                    this.addLog('error', `Failed to send SMS via Messages API: ${data.message || 'Unknown error'}`);
+                }
+
+                // Add to history
+                this.history.messagesSms.unshift({
+                    timestamp: new Date().toLocaleTimeString(),
+                    to: this.messagesSms.to,
+                    success: success,
+                    request: this.messagesSms.request,
+                    response: this.messagesSms.response
+                });
+
+            } catch (error) {
+                this.addLog('error', `Messages API SMS send failed: ${error.message}`);
+                this.messagesSms.response = JSON.stringify({ error: error.message }, null, 2);
+
+                this.history.messagesSms.unshift({
+                    timestamp: new Date().toLocaleTimeString(),
+                    to: this.messagesSms.to,
+                    success: false,
+                    request: this.messagesSms.request,
+                    response: this.messagesSms.response
+                });
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        /**
+         * Send WhatsApp message via Messages API
          */
         async sendWhatsApp() {
             this.loading = true;
@@ -424,7 +525,7 @@ function apiTestingTool() {
             this.whatsapp.request = JSON.stringify(requestData, null, 2);
 
             try {
-                const response = await fetch('/api-testing/api/whatsapp/send', {
+                const response = await fetch('/api-testing/api/messages/whatsapp/send', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -663,6 +764,201 @@ function apiTestingTool() {
                     success: false,
                     request: this.verify.cancel.request,
                     response: this.verify.cancel.response
+                });
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        /**
+         * Start Verify v2 verification
+         */
+        async startVerification2() {
+            this.loading = true;
+            this.loadingMessage = 'Starting Verify v2 verification...';
+            this.addLog('info', `Starting Verify v2 verification for ${this.verify2.start.to}...`);
+
+            const requestData = {
+                api_key: this.apiKey,
+                api_secret: this.apiSecret,
+                to: this.verify2.start.to,
+                brand: this.verify2.start.brand,
+                channel: this.verify2.start.channel
+            };
+
+            this.verify2.start.request = JSON.stringify(requestData, null, 2);
+
+            try {
+                const response = await fetch('/api-testing/api/verify2/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const data = await response.json();
+                this.verify2.start.response = JSON.stringify(data, null, 2);
+
+                const success = response.ok && data.success;
+
+                if (success) {
+                    this.addLog('success', `Verify v2 verification started. Request ID: ${data.request_id || 'N/A'}`);
+
+                    // Auto-fill check request ID
+                    if (data.request_id) {
+                        this.verify2.check.requestId = data.request_id;
+                    }
+
+                    await this.refreshBalance();
+                } else {
+                    this.addLog('error', `Failed to start Verify v2 verification: ${data.message || data.error || 'Unknown error'}`);
+                }
+
+                // Add to history
+                this.history.verify2Start.unshift({
+                    timestamp: new Date().toLocaleTimeString(),
+                    to: this.verify2.start.to,
+                    requestId: data.request_id || null,
+                    success: success,
+                    request: this.verify2.start.request,
+                    response: this.verify2.start.response
+                });
+
+            } catch (error) {
+                this.addLog('error', `Verify v2 verification start failed: ${error.message}`);
+                this.verify2.start.response = JSON.stringify({ error: error.message }, null, 2);
+
+                this.history.verify2Start.unshift({
+                    timestamp: new Date().toLocaleTimeString(),
+                    to: this.verify2.start.to,
+                    requestId: null,
+                    success: false,
+                    request: this.verify2.start.request,
+                    response: this.verify2.start.response
+                });
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        /**
+         * Check Verify v2 verification code
+         */
+        async checkVerification2() {
+            this.loading = true;
+            this.loadingMessage = 'Checking Verify v2 verification code...';
+            this.addLog('info', `Checking Verify v2 verification code for request ${this.verify2.check.requestId}...`);
+
+            const requestData = {
+                api_key: this.apiKey,
+                api_secret: this.apiSecret,
+                request_id: this.verify2.check.requestId,
+                code: this.verify2.check.code
+            };
+
+            this.verify2.check.request = JSON.stringify(requestData, null, 2);
+
+            try {
+                const response = await fetch('/api-testing/api/verify2/check', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const data = await response.json();
+                this.verify2.check.response = JSON.stringify(data, null, 2);
+
+                const success = response.ok && data.success;
+
+                if (success) {
+                    this.addLog('success', `Verify v2 verification check successful: ${data.status || 'verified'}`);
+                } else {
+                    this.addLog('error', `Verify v2 verification check failed: ${data.message || data.error || 'Unknown error'}`);
+                }
+
+                // Add to history
+                this.history.verify2Check.unshift({
+                    timestamp: new Date().toLocaleTimeString(),
+                    requestId: this.verify2.check.requestId,
+                    success: success,
+                    request: this.verify2.check.request,
+                    response: this.verify2.check.response
+                });
+
+            } catch (error) {
+                this.addLog('error', `Verify v2 verification check failed: ${error.message}`);
+                this.verify2.check.response = JSON.stringify({ error: error.message }, null, 2);
+
+                this.history.verify2Check.unshift({
+                    timestamp: new Date().toLocaleTimeString(),
+                    requestId: this.verify2.check.requestId,
+                    success: false,
+                    request: this.verify2.check.request,
+                    response: this.verify2.check.response
+                });
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        /**
+         * Cancel Verify v2 verification
+         */
+        async cancelVerification2() {
+            this.loading = true;
+            this.loadingMessage = 'Cancelling Verify v2 verification...';
+            this.addLog('info', `Cancelling Verify v2 verification for request ${this.verify2.cancel.requestId}...`);
+
+            const requestData = {
+                api_key: this.apiKey,
+                api_secret: this.apiSecret,
+                request_id: this.verify2.cancel.requestId
+            };
+
+            this.verify2.cancel.request = JSON.stringify(requestData, null, 2);
+
+            try {
+                const response = await fetch('/api-testing/api/verify2/cancel', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const data = await response.json();
+                this.verify2.cancel.response = JSON.stringify(data, null, 2);
+
+                const success = response.ok && data.success;
+
+                if (success) {
+                    this.addLog('success', 'Verify v2 verification cancelled successfully');
+                } else {
+                    this.addLog('error', `Failed to cancel Verify v2 verification: ${data.message || data.error || 'Unknown error'}`);
+                }
+
+                // Add to history
+                this.history.verify2Cancel.unshift({
+                    timestamp: new Date().toLocaleTimeString(),
+                    requestId: this.verify2.cancel.requestId,
+                    success: success,
+                    request: this.verify2.cancel.request,
+                    response: this.verify2.cancel.response
+                });
+
+            } catch (error) {
+                this.addLog('error', `Verify v2 verification cancel failed: ${error.message}`);
+                this.verify2.cancel.response = JSON.stringify({ error: error.message }, null, 2);
+
+                this.history.verify2Cancel.unshift({
+                    timestamp: new Date().toLocaleTimeString(),
+                    requestId: this.verify2.cancel.requestId,
+                    success: false,
+                    request: this.verify2.cancel.request,
+                    response: this.verify2.cancel.response
                 });
             } finally {
                 this.loading = false;
